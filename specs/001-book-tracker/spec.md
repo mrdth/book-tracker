@@ -18,10 +18,11 @@ A reader wants to quickly find and add a specific book to their personal collect
 **Acceptance Scenarios**:
 
 1. **Given** the user enters a book title in the search field, **When** they submit the search, **Then** a list of matching books with basic details (title, author, publish date, cover) is displayed
-2. **Given** search results are displayed, **When** the user selects "Import" on a book, **Then** the book details are saved to the database and the author is imported if not already present
-3. **Given** the user imports a book, **When** the system checks the filesystem collection, **Then** the book's ownership status is correctly identified based on the "Author name/Book title (ID)/" directory pattern
-4. **Given** a book's author doesn't exist in the database, **When** importing the book, **Then** the author is created with available information from the external API, but their other books are not imported
-5. **Given** a book's author already exists in the database, **When** importing the book, **Then** the book is associated with the existing author record
+2. **Given** search results are displayed, **When** the results include books already in the database, **Then** those books display a clear visual indicator showing their status ("Already Imported" or "Deleted")
+3. **Given** search results are displayed, **When** the user selects "Import" on a book, **Then** the book details are saved to the database and the author is imported if not already present
+4. **Given** the user imports a book, **When** the system checks the filesystem collection, **Then** the book's ownership status is correctly identified based on the "Author name/Book title (ID)/" directory pattern
+5. **Given** a book's author doesn't exist in the database, **When** importing the book, **Then** the author is created with available information from the external API, but their other books are not imported
+6. **Given** a book's author already exists in the database, **When** importing the book, **Then** the book is associated with the existing author record
 
 ---
 
@@ -110,26 +111,27 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-001**: System MUST provide a unified search interface that accepts author name, book title, or ISBN input
 - **FR-002**: System MUST query the Hardcover GraphQL API to retrieve search results
 - **FR-003**: System MUST display search results in an easily scannable list format with key identifying information (title, author, cover image if available)
-- **FR-004**: System MUST provide an "Import" action for each search result (book or author with books)
-- **FR-005**: System MUST store imported books with all available metadata (title, author, ISBN, publication date, description, cover URL, etc.)
-- **FR-006**: System MUST store imported authors with all available metadata (name, bio, photo URL, etc.)
-- **FR-007**: System MUST associate each book with its author(s) in the database
-- **FR-008**: System MUST check the filesystem at the path pattern "Author name/Book title (ID)/" to determine if the user owns each imported book
-- **FR-009**: System MUST store ownership status for each book based on filesystem check results
-- **FR-010**: When importing a single book by title or ISBN, system MUST import the book's author if not already present, but MUST NOT import the author's other books
-- **FR-011**: When importing via author search, system MUST import all of the author's books from the API
-- **FR-012**: System MUST provide an author detail page displaying bio and list of books
-- **FR-013**: System MUST allow users to edit author biographical information on the author detail page
-- **FR-014**: System MUST provide an "Update from API" function on author pages to fetch and import new books
-- **FR-015**: System MUST allow users to mark books as deleted
-- **FR-016**: Books marked as deleted MUST be retained in the database with deleted status
-- **FR-017**: Deleted books MUST NOT appear on author pages or in book lists
-- **FR-018**: Deleted books MUST NOT be re-imported during author updates or subsequent import operations
-- **FR-019**: System MUST handle books with multiple authors by creating associations with all author records
-- **FR-020**: System MUST gracefully handle API errors and display user-friendly error messages
-- **FR-021**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
-- **FR-022**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
-- **FR-023**: System MUST display search results with pagination showing 50 results per page
+- **FR-004**: System MUST display visual status indicators in search results showing if a book is already in the database (with distinct markers for "Already Imported", "Deleted", or "Not in Database")
+- **FR-005**: System MUST provide an "Import" action for each search result (book or author with books)
+- **FR-006**: System MUST store imported books with all available metadata (title, author, ISBN, publication date, description, cover URL, etc.)
+- **FR-007**: System MUST store imported authors with all available metadata (name, bio, photo URL, etc.)
+- **FR-008**: System MUST associate each book with its author(s) in the database
+- **FR-009**: System MUST check the filesystem at the path pattern "Author name/Book title (ID)/" to determine if the user owns each imported book
+- **FR-010**: System MUST store ownership status for each book based on filesystem check results
+- **FR-011**: When importing a single book by title or ISBN, system MUST import the book's author if not already present, but MUST NOT import the author's other books
+- **FR-012**: When importing via author search, system MUST import all of the author's books from the API
+- **FR-013**: System MUST provide an author detail page displaying bio and list of books
+- **FR-014**: System MUST allow users to edit author biographical information on the author detail page
+- **FR-015**: System MUST provide an "Update from API" function on author pages to fetch and import new books
+- **FR-016**: System MUST allow users to mark books as deleted
+- **FR-017**: Books marked as deleted MUST be retained in the database with deleted status
+- **FR-018**: Deleted books MUST NOT appear on author pages or in book lists
+- **FR-019**: Deleted books MUST NOT be re-imported during author updates or subsequent import operations
+- **FR-020**: System MUST handle books with multiple authors by creating associations with all author records
+- **FR-021**: System MUST gracefully handle API errors and display user-friendly error messages
+- **FR-022**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
+- **FR-023**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
+- **FR-024**: System MUST display search results with pagination showing 50 results per page
 
 ### Key Entities
 
