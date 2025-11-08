@@ -2,25 +2,25 @@
   SYNC IMPACT REPORT
   ==================
   Version Change: [TEMPLATE] → 1.0.0
-  
+
   Initial Constitution Creation:
   - Established 5 core principles for Book Tracker project
   - Defined governance and compliance framework
   - Created baseline for all future development
-  
+
   Principles Defined:
   1. User-Centric Design - Focus on reader experience
   2. Data Integrity & Privacy - Protect user reading data
   3. Incremental Development - Test-driven, iterative delivery
   4. Simplicity First - YAGNI and maintainability
   5. Observable & Debuggable - Comprehensive logging and monitoring
-  
+
   Templates Status:
   ✅ plan-template.md - Constitution Check section aligns with principles
   ✅ spec-template.md - User story and requirements structure supports principles
   ✅ tasks-template.md - Task organization enables incremental development
   ✅ Command files - Generic guidance, no agent-specific references needed
-  
+
   Follow-up TODOs: None - all placeholders filled
 -->
 
@@ -44,7 +44,7 @@ Every feature must serve a clear reader need. Before implementing any functional
 User reading data is sacred and must be protected with the highest standards:
 
 - All user data MUST be stored securely with appropriate access controls
-- Users MUST have full ownership and export capability of their data
+- Users MUST have full ownership of their data
 - Data validation MUST prevent corruption or loss of reading records
 - Privacy by design: minimize data collection, maximize user control
 - No tracking or analytics without explicit user consent
