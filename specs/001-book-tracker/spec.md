@@ -5,6 +5,16 @@
 **Status**: Draft
 **Input**: User description: "Build a book tracker application. A user can search for an author, title, or ISBN. Searches will be performed using the Hardcover graphql API..."
 
+## Clarifications
+
+### Session 2025-11-08
+
+- Q: Application access model (single-user vs multi-user)? → A: Single-user only (one person per installation, no user accounts)
+- Q: Filesystem collection root path configuration? → A: provided via .env file
+- Q: API rate limiting strategy for bulk operations? → A: Implement client-side rate limiting with exponential backoff
+- Q: Logging and observability level? → A: Log API calls, errors, import operations, and user actions
+- Q: Database storage type? → A: Local embedded database (SQLite)
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Search and Import Books by Title (Priority: P1)
@@ -120,7 +130,7 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-006**: System MUST store imported books with all available metadata (title, author, ISBN, publication date, description, cover URL, etc.)
 - **FR-007**: System MUST store imported authors with all available metadata (name, bio, photo URL, etc.)
 - **FR-008**: System MUST associate each book with its author(s) in the database
-- **FR-009**: System MUST check the filesystem at the path pattern "Author name/Book title (ID)/" to determine if the user owns each imported book
+- **FR-009**: System MUST check the filesystem at the path pattern "{COLLECTION_ROOT}/Author name/Book title (ID)/" to determine if the user owns each imported book, where COLLECTION_ROOT is configured via .env file
 - **FR-010**: System MUST store ownership status for each book based on filesystem check results
 - **FR-011**: System MUST allow users to manually mark any book as owned, overriding the filesystem-based ownership detection
 - **FR-012**: When importing a single book by title or ISBN, system MUST import the book's author if not already present, but MUST NOT import the author's other books
@@ -138,9 +148,13 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-024**: Deleted books MUST NOT be re-imported during author updates or subsequent import operations
 - **FR-025**: System MUST handle books with multiple authors by creating associations with all author records
 - **FR-026**: System MUST gracefully handle API errors and display user-friendly error messages
+- **FR-031**: System MUST implement client-side rate limiting with exponential backoff when making requests to the Hardcover API to prevent exceeding rate limits during bulk operations
 - **FR-027**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
 - **FR-028**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
 - **FR-029**: System MUST display search results with pagination showing 50 results per page
+- **FR-030**: System is designed for single-user operation with no authentication or user account management required
+- **FR-032**: System MUST implement structured logging that captures API calls (endpoint, parameters, response status), errors (with stack traces), import operations (book/author imported, counts), and user actions (search, import, edit, delete operations)
+- **FR-033**: System MUST use SQLite as the local embedded database for persisting books, authors, and relationships
 
 ### Key Entities
 
@@ -154,7 +168,7 @@ A reader wants to remove a book from their visible collection without losing the
 ### Measurable Outcomes
 
 - **SC-001**: Users can find and import a book by title in under 30 seconds (assuming normal API response time)
-- **SC-002**: Users can find and import an author's complete bibliography in under 60 seconds
+- **SC-002**: Users can find and import an author's complete bibliography in under 60 seconds (excluding intentional rate limit delays for API compliance)
 - **SC-003**: 95% of book imports correctly identify ownership status from the filesystem
 - **SC-004**: Deleted books never reappear in visible book lists or get re-imported
 - **SC-005**: System correctly handles API failures by displaying clear error messages without data corruption
@@ -168,8 +182,10 @@ A reader wants to remove a book from their visible collection without losing the
 
 - The Hardcover GraphQL API is documented and accessible with reasonable rate limits
 - The Hardcover API returns structured data in a consistent format for books and authors
-- The user's book collection on the filesystem follows the "Author name/Book title (ID)/" directory structure reliably
+- The user's book collection on the filesystem follows the "{COLLECTION_ROOT}/Author name/Book title (ID)/" directory structure reliably, where COLLECTION_ROOT is specified in .env file
 - The external ID in the filesystem directory matches an identifier available from the Hardcover API
 - Network connectivity to the Hardcover API is generally available during use
 - Users have read/write access to both the local database and the filesystem collection directory
 - Book uniqueness is determined by the combination of author name and book title; editions are not tracked as separate entities
+- Single-user installation with no concurrent access concerns
+- SQLite database file is stored locally and backed up by user's standard backup processes
