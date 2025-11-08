@@ -30,7 +30,7 @@ A reader wants to quickly find and add a specific book to their personal collect
 1. **Given** the user enters a book title in the search field, **When** they submit the search, **Then** a list of matching books with basic details (title, author, publish date, cover) is displayed
 2. **Given** search results are displayed, **When** the results include books already in the database, **Then** those books display a clear visual indicator showing their status ("Already Imported" or "Deleted")
 3. **Given** search results are displayed, **When** the user selects "Import" on a book, **Then** the book details are saved to the database and the author is imported if not already present
-4. **Given** the user imports a book, **When** the system checks the filesystem collection, **Then** the book's ownership status is correctly identified based on the "Author name/Book title (ID)/" directory pattern
+4. **Given** the user imports a book, **When** the system checks the filesystem collection, **Then** the book's ownership status is correctly identified by matching author name and book title against directory structure (case-insensitive)
 5. **Given** a book is in the database with ownership status "not owned", **When** the user manually marks it as owned, **Then** the ownership status is updated and persists regardless of filesystem status
 6. **Given** a book's author doesn't exist in the database, **When** importing the book, **Then** the author is created with available information from the external API, but their other books are not imported
 7. **Given** a book's author already exists in the database, **When** importing the book, **Then** the book is associated with the existing author record
@@ -49,7 +49,7 @@ A reader discovers a new author and wants to add all their books to the database
 
 1. **Given** the user enters an author name in the search field, **When** they submit the search, **Then** a list of matching authors with basic information is displayed
 2. **Given** search results show multiple authors, **When** the user selects "Import books" for an author, **Then** the author and all their books are imported into the database
-3. **Given** books are imported for an author, **When** the system checks the filesystem, **Then** each book's ownership status is determined by matching the "Author name/Book title (ID)/" directory pattern
+3. **Given** books are imported for an author, **When** the system checks the filesystem, **Then** each book's ownership status is determined by matching author name and book title against directory structure (case-insensitive)
 4. **Given** some of the author's books already exist in the database (including deleted ones), **When** importing the author's books, **Then** existing books are not duplicated and deleted books are not re-imported
 
 ---
@@ -109,14 +109,49 @@ A reader wants to remove a book from their visible collection without losing the
 
 ### Edge Cases
 
-- What happens when the external API is unavailable or returns an error during search or import?
-- What happens when the filesystem collection directory structure doesn't match the expected "Author name/Book title (ID)/" pattern?
-- What happens when a book has multiple authors (co-authors)?
-- What happens when an author's name changes (married name, pseudonym) between imports?
-- What happens when the filesystem has multiple books with the same title by the same author but different IDs?
-- What happens when searching returns hundreds or thousands of results?
-- What happens when a book has no ISBN or multiple ISBNs?
-- What happens when the external API data is incomplete (missing author bio, missing book details)?
+- **External API unavailable or error during search/import**:
+  - Retry up to 3 times with exponential backoff (2s, 4s, 8s delays)
+  - After retries exhausted, display user-friendly error message: "Unable to connect to Hardcover API. Please check your internet connection and try again."
+  - Log error with full stack trace for debugging (FR-032)
+  - Allow user to continue using locally cached data
+  
+- **Filesystem collection directory structure doesn't match expected pattern**:
+  - Expected pattern: `{COLLECTION_ROOT}/Author name/Book title/` or `{COLLECTION_ROOT}/Author name/Book title (any text)/`
+  - The ID in parentheses (if present) is for user organization only and is NOT the Hardcover external ID - it should be ignored
+  - Ownership matching: Match books by comparing author name + book title from database against filesystem directory names
+  - Handle gracefully: Skip directories that don't match 3-level pattern without crashing (FR-027)
+  - Follow symlinks to actual directories (treat as regular directories)
+  - Case sensitivity: Match case-insensitive for both author and title on all platforms (users may have inconsistent capitalization)
+  - Extra subdirectories: Ignore any directories beyond the 3-level pattern
+  - Books without parenthetical IDs: Process normally - `Author name/Book title/` is valid
+  
+- **Book has multiple authors (co-authors)**:
+  - Create BookAuthor associations for all authors (FR-025)
+  - Preserve author order from Hardcover API using `author_order` field
+  - Display all authors in UI separated by commas
+  
+- **Author's name changes between imports**:
+  - Match by Hardcover external_id, not name
+  - Name updates will create new author record (by design - user can manually merge if needed)
+  
+- **Filesystem has multiple books with same title by same author but different IDs**:
+  - Each unique ID creates separate ownership record
+  - All matching IDs mark the book as owned (filesystem source)
+  
+- **Search returns hundreds or thousands of results**:
+  - Pagination limits to 50 results per page (FR-029)
+  - Display total result count with "Showing 1-50 of 1,234 results"
+  - Provide "Load More" or page navigation controls
+  
+- **Book has no ISBN or multiple ISBNs**:
+  - Store first ISBN if multiple returned from API
+  - Store null if no ISBN available (isbn field nullable in schema)
+  - Search by ISBN only matches exact ISBN, does not return partial matches
+  
+- **External API data is incomplete (missing author bio, missing book details)**:
+  - Import available fields, store null for missing fields
+  - Display "(No description available)" or similar placeholder in UI
+  - Allow user to manually add missing information via edit functionality
 
 ## Requirements *(mandatory)*
 
@@ -130,7 +165,7 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-006**: System MUST store imported books with all available metadata (title, author, ISBN, publication date, description, cover URL, etc.)
 - **FR-007**: System MUST store imported authors with all available metadata (name, bio, photo URL, etc.)
 - **FR-008**: System MUST associate each book with its author(s) in the database
-- **FR-009**: System MUST check the filesystem at the path pattern "{COLLECTION_ROOT}/Author name/Book title (ID)/" to determine if the user owns each imported book, where COLLECTION_ROOT is configured via .env file
+- **FR-009**: System MUST check the filesystem at the path pattern "{COLLECTION_ROOT}/Author name/Book title/" to determine if the user owns each imported book by matching author name and book title (case-insensitive), where COLLECTION_ROOT is configured via .env file. Any text in parentheses after the book title is ignored.
 - **FR-010**: System MUST store ownership status for each book based on filesystem check results
 - **FR-011**: System MUST allow users to manually mark any book as owned, overriding the filesystem-based ownership detection
 - **FR-012**: When importing a single book by title or ISBN, system MUST import the book's author if not already present, but MUST NOT import the author's other books
@@ -151,7 +186,7 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-031**: System MUST implement client-side rate limiting with exponential backoff when making requests to the Hardcover API to prevent exceeding rate limits during bulk operations
 - **FR-027**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
 - **FR-028**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
-- **FR-029**: System MUST display search results with pagination showing 50 results per page
+- **FR-029**: System MUST display search results with pagination showing 50 results per page (balances user scanning behavior with API response time and prevents overwhelming UI)
 - **FR-030**: System is designed for single-user operation with no authentication or user account management required
 - **FR-032**: System MUST implement structured logging that captures API calls (endpoint, parameters, response status), errors (with stack traces), import operations (book/author imported, counts), and user actions (search, import, edit, delete operations)
 - **FR-033**: System MUST use SQLite as the local embedded database for persisting books, authors, and relationships
@@ -169,21 +204,21 @@ A reader wants to remove a book from their visible collection without losing the
 
 - **SC-001**: Users can find and import a book by title in under 30 seconds (assuming normal API response time)
 - **SC-002**: Users can find and import an author's complete bibliography in under 60 seconds (excluding intentional rate limit delays for API compliance)
-- **SC-003**: 95% of book imports correctly identify ownership status from the filesystem
+- **SC-003**: 95% of book imports correctly identify ownership status from the filesystem (validated manually during testing with sample collection; automated validation not required)
 - **SC-004**: Deleted books never reappear in visible book lists or get re-imported
-- **SC-005**: System correctly handles API failures by displaying clear error messages without data corruption
+- **SC-005**: System correctly handles API failures by displaying clear error messages without data corruption (validated through manual testing of network disconnection scenarios)
 - **SC-006**: Users can edit author information and changes persist across sessions
 - **SC-007**: ISBN searches return exact matches within 5 seconds
 - **SC-008**: Author page updates fetch and import new books within 30 seconds
 - **SC-009**: All search types (author, title, ISBN) provide results in a consistent, easy-to-scan format
-- **SC-010**: 90% of users successfully complete their first book import without assistance or errors
+- **SC-010**: 90% of users successfully complete their first book import without assistance or errors (post-launch user success metric; not validated during development)
 
 ## Assumptions
 
 - The Hardcover GraphQL API is documented and accessible with reasonable rate limits
 - The Hardcover API returns structured data in a consistent format for books and authors
-- The user's book collection on the filesystem follows the "{COLLECTION_ROOT}/Author name/Book title (ID)/" directory structure reliably, where COLLECTION_ROOT is specified in .env file
-- The external ID in the filesystem directory matches an identifier available from the Hardcover API
+- The user's book collection on the filesystem follows the "{COLLECTION_ROOT}/Author name/Book title/" directory structure (with optional parenthetical text after title), where COLLECTION_ROOT is specified in .env file
+- Author names and book titles in filesystem directories reasonably match the names from Hardcover API (case-insensitive matching handles minor variations)
 - Network connectivity to the Hardcover API is generally available during use
 - Users have read/write access to both the local database and the filesystem collection directory
 - Book uniqueness is determined by the combination of author name and book title; editions are not tracked as separate entities

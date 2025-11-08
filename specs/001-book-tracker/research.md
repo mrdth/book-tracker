@@ -210,6 +210,13 @@ npm install --save-dev @graphql-codegen/cli @graphql-codegen/typescript
 ```
 
 **Rate Limiting Wrapper** (Backend):
+
+Implementation parameters (from spec.md Edge Cases):
+- **Max retries**: 3 attempts
+- **Exponential backoff delays**: 2s, 4s, 8s (base 2s, multiplier 2x)
+- **Min interval between requests**: 1 second (prevents burst)
+- **Concurrency limit**: 1 concurrent request
+
 ```typescript
 import { GraphQLClient } from 'graphql-request';
 import pLimit from 'p-limit';
@@ -219,18 +226,32 @@ class RateLimitedHardcoverClient {
   private limiter = pLimit(1); // 1 concurrent request
   private lastRequest = 0;
   private minInterval = 1000; // 1 second between requests
+  private maxRetries = 3; // Max retry attempts
+  private baseBackoff = 2000; // 2 seconds base backoff
 
   async request<T>(query: string, variables?: any): Promise<T> {
     return this.limiter(async () => {
-      const now = Date.now();
-      const timeSinceLastRequest = now - this.lastRequest;
-      if (timeSinceLastRequest < this.minInterval) {
-        await new Promise(resolve => 
-          setTimeout(resolve, this.minInterval - timeSinceLastRequest)
-        );
+      for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+        try {
+          const now = Date.now();
+          const timeSinceLastRequest = now - this.lastRequest;
+          if (timeSinceLastRequest < this.minInterval) {
+            await new Promise(resolve => 
+              setTimeout(resolve, this.minInterval - timeSinceLastRequest)
+            );
+          }
+          this.lastRequest = Date.now();
+          return await this.client.request<T>(query, variables);
+        } catch (error) {
+          if (attempt < this.maxRetries) {
+            const backoffDelay = this.baseBackoff * Math.pow(2, attempt); // 2s, 4s, 8s
+            console.warn(`API request failed (attempt ${attempt + 1}), retrying in ${backoffDelay}ms`);
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+          } else {
+            throw error; // All retries exhausted
+          }
+        }
       }
-      this.lastRequest = Date.now();
-      return this.client.request<T>(query, variables);
     });
   }
 }
@@ -620,32 +641,39 @@ describe('SearchBar', () => {
 import { glob } from 'fs/promises';
 import path from 'path';
 
+interface BookOwnership {
+  authorName: string;
+  bookTitle: string;
+}
+
 async function scanCollectionForOwnership(
   collectionRoot: string
-): Promise<Map<string, boolean>> {
+): Promise<BookOwnership[]> {
   const pattern = path.join(collectionRoot, '*/*/*/');
-  const ownershipMap = new Map<string, boolean>();
+  const ownedBooks: BookOwnership[] = [];
 
   // Async iteration - doesn't block event loop
   for await (const dirPath of glob(pattern)) {
-    // Parse directory structure: "{root}/Author name/Book title (ID)/"
+    // Parse directory structure: "{root}/Author name/Book title/" or "{root}/Author name/Book title (anything)/"
     const parts = dirPath.split(path.sep);
-    const bookDirName = parts[parts.length - 2]; // "Book title (ID)"
+    const authorName = parts[parts.length - 3]; // Author directory
+    const bookDirName = parts[parts.length - 2]; // Book directory
     
-    // Extract ID from directory name
-    const idMatch = bookDirName.match(/\(([^)]+)\)$/);
-    if (idMatch) {
-      const bookId = idMatch[1];
-      ownershipMap.set(bookId, true);
+    // Strip any parenthetical text from book title (e.g., "(2023)" or "(hardcover)")
+    // This is for user organization only, not matching
+    const bookTitle = bookDirName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    
+    if (authorName && bookTitle) {
+      ownedBooks.push({ authorName, bookTitle });
     }
   }
 
-  return ownershipMap;
+  return ownedBooks;
 }
 
-// Usage
-const ownership = await scanCollectionForOwnership(process.env.COLLECTION_ROOT);
-console.log(`Found ${ownership.size} owned books in filesystem`);
+// Usage - returns list of owned books by author/title, not by external ID
+const ownedBooks = await scanCollectionForOwnership(process.env.COLLECTION_ROOT);
+console.log(`Found ${ownedBooks.length} owned books in filesystem`);
 ```
 
 **Error Handling and Validation**:
@@ -657,7 +685,7 @@ import path from 'path';
 
 async function scanCollectionWithValidation(
   collectionRoot: string
-): Promise<Map<string, boolean>> {
+): Promise<BookOwnership[]> {
   // Validate collection root exists and is readable
   try {
     await access(collectionRoot, constants.R_OK);
@@ -666,20 +694,23 @@ async function scanCollectionWithValidation(
   }
 
   const pattern = path.join(collectionRoot, '*/*/*/');
-  const ownershipMap = new Map<string, boolean>();
+  const ownedBooks: BookOwnership[] = [];
   const errors: string[] = [];
 
   try {
     for await (const dirPath of glob(pattern)) {
       try {
         const parts = dirPath.split(path.sep);
+        const authorName = parts[parts.length - 3];
         const bookDirName = parts[parts.length - 2];
         
-        const idMatch = bookDirName.match(/\(([^)]+)\)$/);
-        if (idMatch) {
-          ownershipMap.set(idMatch[1], true);
+        // Strip parenthetical text (e.g., "(2023)" or "(hardcover)")
+        const bookTitle = bookDirName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        
+        if (authorName && bookTitle) {
+          ownedBooks.push({ authorName, bookTitle });
         } else {
-          errors.push(`Invalid directory format: ${dirPath}`);
+          errors.push(`Invalid directory format (missing author or title): ${dirPath}`);
         }
       } catch (error) {
         errors.push(`Error processing ${dirPath}: ${error.message}`);
@@ -693,7 +724,7 @@ async function scanCollectionWithValidation(
     console.warn(`Scan completed with ${errors.length} errors:`, errors);
   }
 
-  return ownershipMap;
+  return ownedBooks;
 }
 ```
 
@@ -701,15 +732,15 @@ async function scanCollectionWithValidation(
 
 ```typescript
 class OwnershipScanner {
-  private cache: Map<string, boolean> = new Map();
+  private cache: BookOwnership[] = [];
   private lastScan: number = 0;
   private cacheTTL: number = 60 * 60 * 1000; // 1 hour
 
-  async getOwnership(collectionRoot: string, forceRefresh = false): Promise<Map<string, boolean>> {
+  async getOwnership(collectionRoot: string, forceRefresh = false): Promise<BookOwnership[]> {
     const now = Date.now();
     const cacheExpired = (now - this.lastScan) > this.cacheTTL;
 
-    if (!forceRefresh && !cacheExpired && this.cache.size > 0) {
+    if (!forceRefresh && !cacheExpired && this.cache.length > 0) {
       return this.cache;
     }
 
@@ -718,12 +749,20 @@ class OwnershipScanner {
     return this.cache;
   }
 
-  isOwned(bookId: string): boolean {
-    return this.cache.get(bookId) ?? false;
+  isOwned(authorName: string, bookTitle: string): boolean {
+    // Case-insensitive matching per spec.md
+    const normalizedAuthor = authorName.toLowerCase().trim();
+    const normalizedTitle = bookTitle.toLowerCase().trim();
+    
+    return this.cache.some(
+      book => 
+        book.authorName.toLowerCase().trim() === normalizedAuthor &&
+        book.bookTitle.toLowerCase().trim() === normalizedTitle
+    );
   }
 
   invalidateCache(): void {
-    this.cache.clear();
+    this.cache = [];
     this.lastScan = 0;
   }
 }
