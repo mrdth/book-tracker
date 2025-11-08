@@ -1,0 +1,756 @@
+openapi: 3.0.3
+info:
+  title: Book Tracker API
+  description: Backend REST API for the Book Tracker application, providing search, import, and management of books and authors.
+  version: 1.0.0
+  contact:
+    name: Book Tracker
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+tags:
+  - name: Search
+    description: Search for books and authors using Hardcover API
+  - name: Books
+    description: Book management operations
+  - name: Authors
+    description: Author management operations
+
+paths:
+  /search:
+    post:
+      summary: Search for books or authors
+      description: |
+        Unified search endpoint supporting title, author name, and ISBN searches.
+        Queries the Hardcover GraphQL API and returns results with local database status indicators.
+      tags:
+        - Search
+      operationId: search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchRequest'
+      responses:
+        '200':
+          description: Search results with status indicators
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: Invalid search parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error or Hardcover API failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /books:
+    post:
+      summary: Import a book
+      description: |
+        Import a book from Hardcover API by external ID. Creates or associates with existing author.
+        Checks filesystem for ownership status. Prevents duplicate imports and re-import of deleted books.
+      tags:
+        - Books
+      operationId: importBook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportBookRequest'
+      responses:
+        '201':
+          description: Book successfully imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookWithAuthors'
+        '400':
+          description: Invalid request or book already imported/deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error or Hardcover API failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /books/{id}:
+    get:
+      summary: Get book details
+      description: Retrieve a single book by internal database ID with author information
+      tags:
+        - Books
+      operationId: getBook
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      responses:
+        '200':
+          description: Book details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookWithAuthors'
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Update book ownership or deletion status
+      description: |
+        Update book metadata. Supports marking as owned (manual override) or marking as deleted (soft delete).
+      tags:
+        - Books
+      operationId: updateBook
+      parameters:
+        - $ref: '#/components/parameters/BookId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookRequest'
+      responses:
+        '200':
+          description: Book successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookWithAuthors'
+        '400':
+          description: Invalid update parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /books/bulk:
+    patch:
+      summary: Bulk update books
+      description: |
+        Update multiple books simultaneously (mark as owned or delete).
+        Used for bulk actions on author pages.
+      tags:
+        - Books
+      operationId: bulkUpdateBooks
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUpdateBooksRequest'
+      responses:
+        '200':
+          description: Books successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkUpdateBooksResponse'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /authors:
+    post:
+      summary: Import an author with all their books
+      description: |
+        Import an author and their complete bibliography from Hardcover API.
+        Checks each book for existing imports and deleted status.
+        Scans filesystem for ownership status of each book.
+      tags:
+        - Authors
+      operationId: importAuthor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportAuthorRequest'
+      responses:
+        '201':
+          description: Author and books successfully imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportAuthorResponse'
+        '400':
+          description: Invalid request or author already imported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error or Hardcover API failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /authors/{id}:
+    get:
+      summary: Get author details
+      description: Retrieve author with active (non-deleted) books and book counts
+      tags:
+        - Authors
+      operationId: getAuthor
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      responses:
+        '200':
+          description: Author details with books
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorWithBooks'
+        '404':
+          description: Author not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      summary: Update author biographical information
+      description: Update author name, bio, or photo URL
+      tags:
+        - Authors
+      operationId: updateAuthor
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAuthorRequest'
+      responses:
+        '200':
+          description: Author successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '400':
+          description: Invalid update parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Author not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /authors/{id}/refresh:
+    post:
+      summary: Refresh author books from Hardcover API
+      description: |
+        Fetch latest book list from Hardcover API and import new books.
+        Respects deleted books (does not re-import).
+        Updates ownership status from filesystem scan.
+      tags:
+        - Authors
+      operationId: refreshAuthorBooks
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      responses:
+        '200':
+          description: Author books refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshAuthorBooksResponse'
+        '404':
+          description: Author not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error or Hardcover API failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /ownership/scan:
+    post:
+      summary: Scan filesystem for book ownership
+      description: |
+        Trigger a manual filesystem scan to update ownership status for all books.
+        Only updates books with owned_source='filesystem' or 'none' (respects manual overrides).
+      tags:
+        - Books
+      operationId: scanOwnership
+      responses:
+        '200':
+          description: Filesystem scan completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnershipScanResponse'
+        '500':
+          description: Filesystem scan error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    BookId:
+      name: id
+      in: path
+      required: true
+      description: Internal database ID of the book
+      schema:
+        type: integer
+        minimum: 1
+
+    AuthorId:
+      name: id
+      in: path
+      required: true
+      description: Internal database ID of the author
+      schema:
+        type: integer
+        minimum: 1
+
+  schemas:
+    # Request Schemas
+    SearchRequest:
+      type: object
+      required:
+        - query
+        - type
+      properties:
+        query:
+          type: string
+          minLength: 1
+          description: Search query string
+          example: "The Great Gatsby"
+        type:
+          type: string
+          enum: [title, author, isbn]
+          description: Type of search to perform
+          example: "title"
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Page number for pagination (50 results per page)
+          example: 1
+
+    ImportBookRequest:
+      type: object
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+          description: Hardcover API book ID
+          example: "12345"
+
+    UpdateBookRequest:
+      type: object
+      properties:
+        owned:
+          type: boolean
+          description: Manual ownership status (sets owned_source='manual')
+        deleted:
+          type: boolean
+          description: Soft deletion flag
+
+    BulkUpdateBooksRequest:
+      type: object
+      required:
+        - bookIds
+      properties:
+        bookIds:
+          type: array
+          items:
+            type: integer
+          minItems: 1
+          description: Array of book IDs to update
+          example: [1, 2, 3]
+        owned:
+          type: boolean
+          description: Mark all books as owned (sets owned_source='manual')
+        deleted:
+          type: boolean
+          description: Mark all books as deleted (soft delete)
+
+    ImportAuthorRequest:
+      type: object
+      required:
+        - externalId
+      properties:
+        externalId:
+          type: string
+          description: Hardcover API author ID
+          example: "67890"
+
+    UpdateAuthorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Author full name
+        bio:
+          type: string
+          nullable: true
+          description: Author biographical information
+        photoUrl:
+          type: string
+          nullable: true
+          description: URL to author photo
+
+    # Response Schemas
+    SearchResponse:
+      type: object
+      required:
+        - results
+        - pagination
+      properties:
+        results:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/BookSearchResult'
+              - $ref: '#/components/schemas/AuthorSearchResult'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    BookSearchResult:
+      type: object
+      required:
+        - type
+        - externalId
+        - title
+        - status
+      properties:
+        type:
+          type: string
+          enum: [book]
+        externalId:
+          type: string
+          description: Hardcover API book ID
+        title:
+          type: string
+        isbn:
+          type: string
+          nullable: true
+        publicationDate:
+          type: string
+          nullable: true
+          format: date
+        coverUrl:
+          type: string
+          nullable: true
+        authors:
+          type: array
+          items:
+            type: object
+            properties:
+              externalId:
+                type: string
+              name:
+                type: string
+        status:
+          type: string
+          enum: [not_imported, imported, deleted]
+          description: Status of book in local database
+
+    AuthorSearchResult:
+      type: object
+      required:
+        - type
+        - externalId
+        - name
+        - status
+      properties:
+        type:
+          type: string
+          enum: [author]
+        externalId:
+          type: string
+          description: Hardcover API author ID
+        name:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        bookCount:
+          type: integer
+          description: Number of books by this author in Hardcover API
+        status:
+          type: string
+          enum: [not_imported, imported]
+          description: Status of author in local database
+
+    Pagination:
+      type: object
+      required:
+        - page
+        - perPage
+        - total
+        - hasMore
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        perPage:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        hasMore:
+          type: boolean
+
+    Book:
+      type: object
+      required:
+        - id
+        - externalId
+        - title
+        - owned
+        - ownedSource
+        - deleted
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        externalId:
+          type: string
+        title:
+          type: string
+        isbn:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        publicationDate:
+          type: string
+          nullable: true
+          format: date
+        coverUrl:
+          type: string
+          nullable: true
+        owned:
+          type: boolean
+        ownedSource:
+          type: string
+          enum: [none, filesystem, manual]
+        deleted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BookWithAuthors:
+      allOf:
+        - $ref: '#/components/schemas/Book'
+        - type: object
+          required:
+            - authors
+          properties:
+            authors:
+              type: array
+              items:
+                $ref: '#/components/schemas/Author'
+
+    Author:
+      type: object
+      required:
+        - id
+        - externalId
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        externalId:
+          type: string
+        name:
+          type: string
+        bio:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AuthorWithBooks:
+      allOf:
+        - $ref: '#/components/schemas/Author'
+        - type: object
+          required:
+            - books
+            - activeBookCount
+            - totalBookCount
+          properties:
+            books:
+              type: array
+              items:
+                $ref: '#/components/schemas/Book'
+              description: Active (non-deleted) books only
+            activeBookCount:
+              type: integer
+              description: Count of non-deleted books
+            totalBookCount:
+              type: integer
+              description: Total count including deleted books
+
+    ImportAuthorResponse:
+      type: object
+      required:
+        - author
+        - importedBooks
+        - skippedBooks
+      properties:
+        author:
+          $ref: '#/components/schemas/Author'
+        importedBooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookWithAuthors'
+          description: Books successfully imported
+        skippedBooks:
+          type: array
+          items:
+            type: object
+            properties:
+              externalId:
+                type: string
+              title:
+                type: string
+              reason:
+                type: string
+                enum: [already_imported, deleted]
+          description: Books skipped due to existing import or deletion
+
+    RefreshAuthorBooksResponse:
+      type: object
+      required:
+        - newBooks
+        - updatedBooks
+        - skippedBooks
+      properties:
+        newBooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookWithAuthors'
+          description: Newly imported books from Hardcover API
+        updatedBooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/BookWithAuthors'
+          description: Existing books with updated ownership status
+        skippedBooks:
+          type: array
+          items:
+            type: object
+            properties:
+              externalId:
+                type: string
+              title:
+                type: string
+              reason:
+                type: string
+                enum: [already_imported, deleted]
+
+    BulkUpdateBooksResponse:
+      type: object
+      required:
+        - updatedCount
+        - updatedBooks
+      properties:
+        updatedCount:
+          type: integer
+          description: Number of books successfully updated
+        updatedBooks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Book'
+
+    OwnershipScanResponse:
+      type: object
+      required:
+        - scannedBooks
+        - ownedBooks
+        - updatedCount
+      properties:
+        scannedBooks:
+          type: integer
+          description: Total books scanned in filesystem
+        ownedBooks:
+          type: integer
+          description: Number of owned books found
+        updatedCount:
+          type: integer
+          description: Number of database records updated
+        errors:
+          type: array
+          items:
+            type: string
+          description: List of errors encountered during scan
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type/code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error context
