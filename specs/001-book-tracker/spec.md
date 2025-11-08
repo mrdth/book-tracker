@@ -58,6 +58,9 @@ A reader wants to maintain accurate author information and keep bibliographies c
 2. **Given** an author page is displayed, **When** the user clicks "Edit", **Then** they can modify the author's biographical information and save changes
 3. **Given** the user is viewing an author page, **When** they select "Update from API", **Then** the system fetches the latest book list and imports any new books not already in the database
 4. **Given** the update process finds books that were previously deleted, **When** importing new books, **Then** deleted books remain deleted and are not re-imported
+5. **Given** the user is viewing an author's book list, **When** they enable bulk action mode, **Then** checkboxes appear next to each book allowing multi-selection
+6. **Given** bulk action mode is enabled and multiple books are selected, **When** the user chooses "Mark as Owned", **Then** all selected books are marked as owned simultaneously
+7. **Given** bulk action mode is enabled and multiple books are selected, **When** the user chooses "Delete", **Then** all selected books are marked as deleted simultaneously
 
 ---
 
@@ -125,15 +128,19 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-014**: System MUST provide an author detail page displaying bio and list of books
 - **FR-015**: System MUST allow users to edit author biographical information on the author detail page
 - **FR-016**: System MUST provide an "Update from API" function on author pages to fetch and import new books
-- **FR-017**: System MUST allow users to mark books as deleted
-- **FR-018**: Books marked as deleted MUST be retained in the database with deleted status
-- **FR-019**: Deleted books MUST NOT appear on author pages or in book lists
-- **FR-020**: Deleted books MUST NOT be re-imported during author updates or subsequent import operations
-- **FR-021**: System MUST handle books with multiple authors by creating associations with all author records
-- **FR-022**: System MUST gracefully handle API errors and display user-friendly error messages
-- **FR-023**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
-- **FR-024**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
-- **FR-025**: System MUST display search results with pagination showing 50 results per page
+- **FR-017**: System MUST provide a bulk action mode on author pages that displays selectable checkboxes for each book in the list
+- **FR-018**: System MUST allow users to select multiple books simultaneously when bulk action mode is enabled
+- **FR-019**: System MUST provide bulk actions to mark multiple selected books as owned in a single operation
+- **FR-020**: System MUST provide bulk actions to delete multiple selected books in a single operation
+- **FR-021**: System MUST allow users to mark books as deleted
+- **FR-022**: Books marked as deleted MUST be retained in the database with deleted status
+- **FR-023**: Deleted books MUST NOT appear on author pages or in book lists
+- **FR-024**: Deleted books MUST NOT be re-imported during author updates or subsequent import operations
+- **FR-025**: System MUST handle books with multiple authors by creating associations with all author records
+- **FR-026**: System MUST gracefully handle API errors and display user-friendly error messages
+- **FR-027**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
+- **FR-028**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
+- **FR-029**: System MUST display search results with pagination showing 50 results per page
 
 ### Key Entities
 
