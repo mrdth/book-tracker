@@ -39,16 +39,17 @@ class OwnershipScanner {
 
     const ownedBooks: BookOwnership[] = [];
     const errors: string[] = [];
-    const pattern = path.join(root, '*/*/*/');
+    // Pattern matches: /root/Author/Book/
+    const pattern = path.join(root, '*/*');
 
     try {
       let count = 0;
-      for await (const dirPath of glob(pattern)) {
+      for await (const dirPath of glob(pattern, { onlyDirectories: true })) {
         count++;
         try {
           const parts = dirPath.split(path.sep);
-          const authorName = parts[parts.length - 3]; // Author directory
-          const bookDirName = parts[parts.length - 2]; // Book directory
+          const authorName = parts[parts.length - 2]; // Author directory
+          const bookDirName = parts[parts.length - 1]; // Book directory
 
           // Strip any parenthetical text from book title (e.g., "(2023)" or "(hardcover)")
           // This is for user organization only, not matching

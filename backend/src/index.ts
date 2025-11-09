@@ -2,6 +2,7 @@ import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
 import { initializeDatabase, closeDatabase } from './db/connection.js';
+import { ownershipScanner } from './services/OwnershipScanner.js';
 
 async function startServer() {
   try {
@@ -9,6 +10,15 @@ async function startServer() {
     logger.info('Initializing database...');
     initializeDatabase(env.databasePath);
     logger.info('Database initialized successfully');
+
+    // Initialize ownership scanner
+    logger.info('Scanning filesystem for owned books...');
+    try {
+      const ownedBooks = await ownershipScanner.scan();
+      logger.info('Ownership scan completed', { ownedBooksCount: ownedBooks.length });
+    } catch (error) {
+      logger.warn('Ownership scan failed, continuing without ownership detection', error);
+    }
 
     // Create Express app
     const app = createApp();

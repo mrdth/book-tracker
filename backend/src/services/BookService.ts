@@ -315,6 +315,7 @@ export class BookService {
   /**
    * Check if a book is owned based on filesystem scan
    * Matches by author name and book title (case-insensitive)
+   * Note: Scanner cache is populated on application startup
    */
   private checkOwnership(hardcoverBook: HardcoverBook, authors: HardcoverAuthor[]): boolean {
     if (authors.length === 0) {

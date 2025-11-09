@@ -116,7 +116,6 @@ export class SearchService {
       // Results is already an object (or might be a JSON string)
       logger.debug('Raw search response', {
         resultsType: typeof response.search.results,
-        results: JSON.stringify(response.search.results),
         hasResults: !!response.search.results,
       });
 
