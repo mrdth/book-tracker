@@ -262,8 +262,8 @@ export class BookService {
     // Try contributions field first (newer API format)
     if (hardcoverBook.contributions && hardcoverBook.contributions.length > 0) {
       return hardcoverBook.contributions
-        .filter((c) => c.contributor_type === 'author' && c.contributor)
-        .map((c) => c.contributor!);
+        .filter((c) => c.author) // Filter out contributions without author data
+        .map((c) => c.author!);
     }
 
     // Fall back to authors field

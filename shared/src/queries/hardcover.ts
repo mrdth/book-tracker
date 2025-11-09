@@ -144,9 +144,10 @@ export interface HardcoverBook {
 }
 
 export interface HardcoverContribution {
-  id: string;
-  contributor_type?: string;
-  contributor?: HardcoverAuthor;
+  id?: string;
+  contributor_type?: string; // Legacy field, may not be present
+  contributor?: HardcoverAuthor; // Legacy field
+  author?: HardcoverAuthor; // Current API format
   book?: HardcoverBook;
 }
 
