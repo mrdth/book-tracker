@@ -114,7 +114,7 @@ A reader wants to remove a book from their visible collection without losing the
   - After retries exhausted, display user-friendly error message: "Unable to connect to Hardcover API. Please check your internet connection and try again."
   - Log error with full stack trace for debugging (FR-032)
   - Allow user to continue using locally cached data
-  
+
 - **Filesystem collection directory structure doesn't match expected pattern**:
   - Expected pattern: `{COLLECTION_ROOT}/Author name/Book title/` or `{COLLECTION_ROOT}/Author name/Book title (any text)/`
   - The ID in parentheses (if present) is for user organization only and is NOT the Hardcover external ID - it should be ignored
@@ -124,30 +124,30 @@ A reader wants to remove a book from their visible collection without losing the
   - Case sensitivity: Match case-insensitive for both author and title on all platforms (users may have inconsistent capitalization)
   - Extra subdirectories: Ignore any directories beyond the 3-level pattern
   - Books without parenthetical IDs: Process normally - `Author name/Book title/` is valid
-  
+
 - **Book has multiple authors (co-authors)**:
   - Create BookAuthor associations for all authors (FR-025)
   - Preserve author order from Hardcover API using `author_order` field
   - Display all authors in UI separated by commas
-  
+
 - **Author's name changes between imports**:
   - Match by Hardcover external_id, not name
   - Name updates will create new author record (by design - user can manually merge if needed)
-  
+
 - **Filesystem has multiple books with same title by same author but different IDs**:
   - Each unique ID creates separate ownership record
   - All matching IDs mark the book as owned (filesystem source)
-  
+
 - **Search returns hundreds or thousands of results**:
-  - Pagination limits to 50 results per page (FR-029)
-  - Display total result count with "Showing 1-50 of 1,234 results"
+  - Pagination limits to 25 results per page (FR-029)
+  - Display total result count with "Showing 1-25 of 1,234 results"
   - Provide "Load More" or page navigation controls
-  
+
 - **Book has no ISBN or multiple ISBNs**:
   - Store first ISBN if multiple returned from API
   - Store null if no ISBN available (isbn field nullable in schema)
   - Search by ISBN only matches exact ISBN, does not return partial matches
-  
+
 - **External API data is incomplete (missing author bio, missing book details)**:
   - Import available fields, store null for missing fields
   - Display "(No description available)" or similar placeholder in UI
@@ -186,7 +186,7 @@ A reader wants to remove a book from their visible collection without losing the
 - **FR-031**: System MUST implement client-side rate limiting with exponential backoff when making requests to the Hardcover API to prevent exceeding rate limits during bulk operations
 - **FR-027**: System MUST handle cases where filesystem directories don't match expected patterns without crashing
 - **FR-028**: System MUST prevent duplicate book entries for the same book based on the combination of author name and book title (editions are not tracked separately)
-- **FR-029**: System MUST display search results with pagination showing 50 results per page (balances user scanning behavior with API response time and prevents overwhelming UI)
+- **FR-029**: System MUST display search results with pagination showing 25 results per page (balances user scanning behavior with API response time and prevents overwhelming UI)
 - **FR-030**: System is designed for single-user operation with no authentication or user account management required
 - **FR-032**: System MUST implement structured logging that captures API calls (endpoint, parameters, response status), errors (with stack traces), import operations (book/author imported, counts), and user actions (search, import, edit, delete operations)
 - **FR-033**: System MUST use SQLite as the local embedded database for persisting books, authors, and relationships

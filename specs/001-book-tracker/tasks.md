@@ -97,29 +97,29 @@
 
 ### Backend Implementation for US1
 
-- [ ] T045 [P] [US1] Create Author model in backend/src/models/Author.ts (CRUD operations for authors table)
-- [ ] T046 [P] [US1] Create Book model in backend/src/models/Book.ts (CRUD operations for books table)
-- [ ] T047 [P] [US1] Create BookAuthor model in backend/src/models/BookAuthor.ts (many-to-many association operations)
-- [ ] T048 [US1] Create BookService in backend/src/services/BookService.ts (import book, check duplicates, check deleted status)
-- [ ] T049 [US1] Create SearchService in backend/src/services/SearchService.ts (query Hardcover API, merge with local DB status)
-- [ ] T050 [US1] Create POST /api/search endpoint in backend/src/api/routes/search.ts (title search with pagination)
-- [ ] T051 [US1] Create POST /api/books endpoint in backend/src/api/routes/books.ts (import book by external ID)
-- [ ] T052 [US1] Create GET /api/books/:id endpoint in backend/src/api/routes/books.ts (get book details)
-- [ ] T053 [US1] Add route registration to Express app in backend/src/app.ts
+- [X] T045 [P] [US1] Create Author model in backend/src/models/Author.ts (CRUD operations for authors table)
+- [X] T046 [P] [US1] Create Book model in backend/src/models/Book.ts (CRUD operations for books table)
+- [X] T047 [P] [US1] Create BookAuthor model in backend/src/models/BookAuthor.ts (many-to-many association operations)
+- [X] T048 [US1] Create BookService in backend/src/services/BookService.ts (import book, check duplicates, check deleted status)
+- [X] T049 [US1] Create SearchService in backend/src/services/SearchService.ts (query Hardcover API, merge with local DB status)
+- [X] T050 [US1] Create POST /api/search endpoint in backend/src/api/routes/search.ts (title search with pagination)
+- [X] T051 [US1] Create POST /api/books endpoint in backend/src/api/routes/books.ts (import book by external ID)
+- [X] T052 [US1] Create GET /api/books/:id endpoint in backend/src/api/routes/books.ts (get book details)
+- [X] T053 [US1] Add route registration to Express app in backend/src/app.ts
 
 ### Frontend Implementation for US1
 
-- [ ] T054 [P] [US1] Create SearchBar component in frontend/src/components/common/SearchBar.vue (unified search input with type selector)
-- [ ] T055 [P] [US1] Create BookCard component in frontend/src/components/books/BookCard.vue (display book with status indicator and import button)
-- [ ] T056 [P] [US1] Create StatusBadge component in frontend/src/components/common/StatusBadge.vue (visual indicators for imported/deleted/not imported)
-- [ ] T057 [US1] Create useBookSearch composable in frontend/src/composables/useBookSearch.ts (search logic, loading states, error handling)
-- [ ] T058 [US1] Create SearchPage in frontend/src/pages/SearchPage.vue (main search interface with results list)
-- [ ] T059 [US1] Add search route to router in frontend/src/router/index.ts
+- [X] T054 [P] [US1] Create SearchBar component in frontend/src/components/common/SearchBar.vue (unified search input with type selector)
+- [X] T055 [P] [US1] Create BookCard component in frontend/src/components/books/BookCard.vue (display book with status indicator and import button)
+- [X] T056 [P] [US1] Create StatusBadge component in frontend/src/components/common/StatusBadge.vue (visual indicators for imported/deleted/not imported)
+- [X] T057 [US1] Create useBookSearch composable in frontend/src/composables/useBookSearch.ts (search logic, loading states, error handling)
+- [X] T058 [US1] Create SearchPage in frontend/src/pages/SearchPage.vue (main search interface with results list)
+- [X] T059 [US1] Add search route to router in frontend/src/router/index.ts
 
 ### Integration for US1
 
-- [ ] T060 [US1] Integrate ownership scanner with book import in backend/src/services/BookService.ts
-- [ ] T061 [US1] Add comprehensive logging to all US1 services (API calls, imports, ownership checks, errors)
+- [X] T060 [US1] Integrate ownership scanner with book import in backend/src/services/BookService.ts
+- [X] T061 [US1] Add comprehensive logging to all US1 services (API calls, imports, ownership checks, errors)
 
 **Checkpoint**: User Story 1 should be fully functional - search by title, import books, view ownership status
 
