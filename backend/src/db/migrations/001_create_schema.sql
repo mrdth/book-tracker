@@ -1,0 +1,5 @@
+-- Initial schema creation
+-- This migration is intentionally empty because the schema is created
+-- by the initializeDatabase function in connection.ts
+--
+-- Future migrations should be added here to modify the schema

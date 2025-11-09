@@ -1,0 +1,24 @@
+import { createRouter, createWebHistory } from 'vue-router';
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      redirect: '/search',
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('../pages/SearchPage.vue'),
+    },
+    {
+      path: '/authors/:id',
+      name: 'author',
+      component: () => import('../pages/AuthorPage.vue'),
+      props: true,
+    },
+  ],
+});
+
+export default router;

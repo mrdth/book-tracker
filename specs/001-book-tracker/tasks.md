@@ -48,42 +48,42 @@
 
 ### Database Infrastructure
 
-- [ ] T021 Create SQLite database schema in backend/src/db/schema.sql (authors, books, book_authors tables with indexes and triggers)
-- [ ] T022 Create database connection module in backend/src/db/connection.ts using better-sqlite3
-- [ ] T023 Create database migration runner in backend/src/db/migrate.ts
-- [ ] T024 Create initial migration 001_create_schema.sql in backend/src/db/migrations/
+- [X] T021 Create SQLite database schema in backend/src/db/schema.sql (authors, books, book_authors tables with indexes and triggers)
+- [X] T022 Create database connection module in backend/src/db/connection.ts using better-sqlite3
+- [X] T023 Create database migration runner in backend/src/db/migrate.ts
+- [X] T024 Create initial migration 001_create_schema.sql in backend/src/db/migrations/
 
 ### Shared Types
 
-- [ ] T025 [P] Create Book type definition in shared/types/book.ts (Book, BookWithAuthors interfaces)
-- [ ] T026 [P] Create Author type definition in shared/types/author.ts (Author, AuthorWithBooks interfaces)
-- [ ] T027 [P] Create API contract types in shared/types/api.ts (request/response types from OpenAPI)
-- [ ] T028 [P] Create GraphQL query definitions in shared/queries/hardcover.ts (all 6 queries from contracts)
+- [X] T025 [P] Create Book type definition in shared/types/book.ts (Book, BookWithAuthors interfaces)
+- [X] T026 [P] Create Author type definition in shared/types/author.ts (Author, AuthorWithBooks interfaces)
+- [X] T027 [P] Create API contract types in shared/types/api.ts (request/response types from OpenAPI)
+- [X] T028 [P] Create GraphQL query definitions in shared/queries/hardcover.ts (all 6 queries from contracts)
 
 ### Backend Core Infrastructure
 
-- [ ] T029 Create environment configuration in backend/src/config/env.ts
-- [ ] T030 Create structured logging utility in backend/src/config/logger.ts (supports DEBUG, INFO, WARN, ERROR levels)
-- [ ] T031 Create Express app setup in backend/src/app.ts (middleware, CORS, JSON parsing, error handling)
-- [ ] T032 Create error handling middleware in backend/src/api/middleware/errorHandler.ts
-- [ ] T033 Create logging middleware in backend/src/api/middleware/requestLogger.ts
-- [ ] T034 Create rate-limited Hardcover GraphQL client in backend/src/services/HardcoverClient.ts (exponential backoff, logging)
-- [ ] T035 Create ownership filesystem scanner in backend/src/services/OwnershipScanner.ts (using native fs.glob)
-- [ ] T036 Create server entry point in backend/src/index.ts
+- [X] T029 Create environment configuration in backend/src/config/env.ts
+- [X] T030 Create structured logging utility in backend/src/config/logger.ts (supports DEBUG, INFO, WARN, ERROR levels)
+- [X] T031 Create Express app setup in backend/src/app.ts (middleware, CORS, JSON parsing, error handling)
+- [X] T032 Create error handling middleware in backend/src/api/middleware/errorHandler.ts
+- [X] T033 Create logging middleware in backend/src/api/middleware/requestLogger.ts
+- [X] T034 Create rate-limited Hardcover GraphQL client in backend/src/services/HardcoverClient.ts (exponential backoff, logging)
+- [X] T035 Create ownership filesystem scanner in backend/src/services/OwnershipScanner.ts (using native fs.glob)
+- [X] T036 Create server entry point in backend/src/index.ts
 
 ### Frontend Core Infrastructure
 
-- [ ] T037 Create Vue Router configuration in frontend/src/router/index.ts (routes for search, author pages)
-- [ ] T038 Create backend API client in frontend/src/services/api.ts (wrapper for fetch with type safety)
-- [ ] T039 Create Tailwind base styles in frontend/src/styles/main.css
-- [ ] T040 Create Vue app entry point in frontend/src/main.ts
+- [X] T037 Create Vue Router configuration in frontend/src/router/index.ts (routes for search, author pages)
+- [X] T038 Create backend API client in frontend/src/services/api.ts (wrapper for fetch with type safety)
+- [X] T039 Create Tailwind base styles in frontend/src/styles/main.css
+- [X] T040 Create Vue app entry point in frontend/src/main.ts
 
 ### Testing Infrastructure
 
-- [ ] T041 Create backend test setup in backend/tests/setup.ts (in-memory SQLite database helper)
-- [ ] T042 Create frontend test setup in frontend/tests/setup.ts (MSW server configuration)
-- [ ] T043 Create MSW request handlers in frontend/tests/mocks/handlers.ts (mock API responses)
-- [ ] T044 Create Hardcover API mock responses in backend/tests/mocks/hardcover.ts
+- [X] T041 Create backend test setup in backend/tests/setup.ts (in-memory SQLite database helper)
+- [X] T042 Create frontend test setup in frontend/tests/setup.ts (MSW server configuration)
+- [X] T043 Create MSW request handlers in frontend/tests/mocks/handlers.ts (mock API responses)
+- [X] T044 Create Hardcover API mock responses in backend/tests/mocks/hardcover.ts
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
