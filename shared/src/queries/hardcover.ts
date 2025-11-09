@@ -70,14 +70,14 @@ export const GET_BOOK_BY_ID = `
 
 export const GET_AUTHOR_WITH_BOOKS = `
   query GetAuthorWithBooks($id: Int!) {
-    users_by_pk(id: $id) {
+    authors_by_pk(id: $id) {
       id
       name
       bio
       image {
         url
       }
-      authored_books: contributions {
+      contributions {
         book {
           id
           title
@@ -89,6 +89,16 @@ export const GET_AUTHOR_WITH_BOOKS = `
           editions {
             isbn_10
             isbn_13
+          }
+          contributions {
+            author {
+              id
+              name
+              bio
+              image {
+                url
+              }
+            }
           }
         }
       }
@@ -96,25 +106,15 @@ export const GET_AUTHOR_WITH_BOOKS = `
   }
 `;
 
-export const REFRESH_AUTHOR_BOOKS = `
-  query RefreshAuthorBooks($id: Int!) {
-    users_by_pk(id: $id) {
-      id
-      authored_books: contributions(order_by: {book: {release_year: desc}}) {
-        book {
-          id
-          title
-          description
-          release_year
-          image {
-            url
-          }
-          editions {
-            isbn_10
-            isbn_13
-          }
-        }
-      }
+export const SEARCH_BOOKS_BY_AUTHOR_NAME = `
+  query SearchBooksByAuthorName($query: String!, $per_page: Int!, $page: Int!) {
+    search(
+      query: $query
+      query_type: "Book"
+      per_page: $per_page
+      page: $page
+    ) {
+      results
     }
   }
 `;
@@ -132,10 +132,10 @@ export interface HardcoverEdition {
 export interface HardcoverBook {
   id: string;
   title: string;
-  isbn?: string | string[] | null; // Legacy field, may still be used in search results
+  isbn?: string | string[] | null; // Can be a string directly or array
   description: string | null;
   release_year: number | null;
-  image: HardcoverImage | null;
+  image: string | HardcoverImage | null; // Can be a string URL or object with url property
   authors?: HardcoverAuthor[];
   author_names?: string[]; // Alternative author field
   isbns?: string[]; // Legacy field, may still be used in search results
@@ -155,13 +155,12 @@ export interface HardcoverAuthor {
   id: string;
   name: string;
   bio?: string | null;
-  image?: HardcoverImage | null;
+  image?: string | HardcoverImage | null; // Can be a string URL or object with url property
   username?: string;
 }
 
 export interface HardcoverAuthorWithBooks extends HardcoverAuthor {
-  books?: HardcoverBook[];
-  authored_books?: HardcoverContribution[];
+  contributions?: HardcoverContribution[];
   books_aggregate?: {
     aggregate: {
       count: number;
@@ -183,5 +182,5 @@ export interface GetBookResponse {
 }
 
 export interface GetAuthorResponse {
-  users_by_pk: HardcoverAuthorWithBooks;
+  authors_by_pk: HardcoverAuthorWithBooks;
 }

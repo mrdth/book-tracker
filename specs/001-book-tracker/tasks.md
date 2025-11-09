@@ -133,24 +133,24 @@
 
 ### Backend Implementation for US2
 
-- [ ] T062 [US2] Add author search to SearchService in backend/src/services/SearchService.ts (query Hardcover API for authors)
-- [ ] T063 [US2] Create AuthorService in backend/src/services/AuthorService.ts (import author with books, check duplicates/deleted, bulk ownership scan)
-- [ ] T064 [US2] Create POST /api/authors endpoint in backend/src/api/routes/authors.ts (import author by external ID with all books)
-- [ ] T065 [US2] Create GET /api/authors/:id endpoint in backend/src/api/routes/authors.ts (get author with active books)
-- [ ] T066 [US2] Add author routes to Express app in backend/src/app.ts
+- [X] T062 [US2] Add author search to SearchService in backend/src/services/SearchService.ts (query Hardcover API for authors)
+- [X] T063 [US2] Create AuthorService in backend/src/services/AuthorService.ts (import author with books, check duplicates/deleted, bulk ownership scan)
+- [X] T064 [US2] Create POST /api/authors endpoint in backend/src/api/routes/authors.ts (import author by external ID with all books)
+- [X] T065 [US2] Create GET /api/authors/:id endpoint in backend/src/api/routes/authors.ts (get author with active books)
+- [X] T066 [US2] Add author routes to Express app in backend/src/app.ts
 
 ### Frontend Implementation for US2
 
-- [ ] T067 [P] [US2] Create AuthorCard component in frontend/src/components/authors/AuthorCard.vue (display author with book count and import button)
-- [ ] T068 [US2] Update SearchBar component to support author search type in frontend/src/components/common/SearchBar.vue
-- [ ] T069 [US2] Update SearchPage to display author results in frontend/src/pages/SearchPage.vue
-- [ ] T070 [US2] Create AuthorPage in frontend/src/pages/AuthorPage.vue (display author bio and book list)
-- [ ] T071 [US2] Add author page route to router in frontend/src/router/index.ts
+- [X] T067 [P] [US2] Create AuthorCard component in frontend/src/components/authors/AuthorCard.vue (display author with book count and import button)
+- [X] T068 [US2] Update SearchBar component to support author search type in frontend/src/components/common/SearchBar.vue
+- [X] T069 [US2] Update SearchPage to display author results in frontend/src/pages/SearchPage.vue
+- [X] T070 [US2] Create AuthorPage in frontend/src/pages/AuthorPage.vue (display author bio and book list)
+- [X] T071 [US2] Add author page route to router in frontend/src/router/index.ts
 
 ### Integration for US2
 
-- [ ] T072 [US2] Add bulk ownership scanning for author imports in backend/src/services/AuthorService.ts
-- [ ] T073 [US2] Add comprehensive logging to all US2 services (author imports, book counts, skipped books)
+- [X] T072 [US2] Add bulk ownership scanning for author imports in backend/src/services/AuthorService.ts
+- [X] T073 [US2] Add comprehensive logging to all US2 services (author imports, book counts, skipped books)
 
 **Checkpoint**: User Stories 1 AND 2 should both work independently
 

@@ -39,6 +39,11 @@ export function createApp(): express.Application {
     logger.info('Books routes registered');
   });
 
+  import('./api/routes/authors.js').then((module) => {
+    app.use('/api/authors', module.default);
+    logger.info('Authors routes registered');
+  });
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 

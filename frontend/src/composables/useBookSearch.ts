@@ -1,6 +1,11 @@
 import { ref, computed, type Ref } from 'vue';
 import { apiClient } from '../services/api';
-import type { SearchRequest, SearchResponse, BookSearchResult, AuthorSearchResult } from '@shared/types/api';
+import type {
+  SearchRequest,
+  SearchResponse,
+  BookSearchResult,
+  AuthorSearchResult,
+} from '@shared/types/api';
 
 export interface UseBookSearchReturn {
   // State
@@ -20,6 +25,7 @@ export interface UseBookSearchReturn {
   search: (query: string, type: 'title' | 'author' | 'isbn', pageNum?: number) => Promise<void>;
   loadMore: () => Promise<void>;
   importBook: (externalId: string) => Promise<void>;
+  importAuthor: (externalId: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -132,6 +138,36 @@ export function useBookSearch(): UseBookSearchReturn {
   };
 
   /**
+   * Import an author with all their books
+   */
+  const importAuthor = async (externalId: string): Promise<void> => {
+    try {
+      console.log(`Importing author: ${externalId}`);
+
+      await apiClient.importAuthor({ externalId });
+
+      // Update the author status in results
+      const index = results.value.findIndex(
+        (result) => result.type === 'author' && result.externalId === externalId
+      );
+
+      if (index !== -1) {
+        const author = results.value[index] as AuthorSearchResult;
+        results.value[index] = {
+          ...author,
+          status: 'imported',
+        };
+      }
+
+      console.log(`Author imported successfully: ${externalId}`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to import author';
+      console.error('Import error:', err);
+      throw new Error(errorMessage);
+    }
+  };
+
+  /**
    * Reset search state
    */
   const reset = (): void => {
@@ -163,6 +199,7 @@ export function useBookSearch(): UseBookSearchReturn {
     search,
     loadMore,
     importBook,
+    importAuthor,
     reset,
   };
 }

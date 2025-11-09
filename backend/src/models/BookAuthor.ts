@@ -29,11 +29,7 @@ export class BookAuthorModel {
       VALUES (?, ?, ?)
     `);
 
-    stmt.run(
-      input.bookId,
-      input.authorId,
-      input.authorOrder ?? 0
-    );
+    stmt.run(input.bookId, input.authorId, input.authorOrder ?? 0);
 
     const association = this.findByBookAndAuthor(input.bookId, input.authorId);
     if (!association) {
@@ -56,7 +52,7 @@ export class BookAuthorModel {
       WHERE book_id = ? AND author_id = ?
     `);
 
-    return stmt.get(bookId, authorId) as BookAuthor | undefined || null;
+    return (stmt.get(bookId, authorId) as BookAuthor | undefined) || null;
   }
 
   /**
@@ -71,7 +67,7 @@ export class BookAuthorModel {
     `);
 
     const results = stmt.all(bookId) as { authorId: number }[];
-    return results.map(r => r.authorId);
+    return results.map((r) => r.authorId);
   }
 
   /**
@@ -86,7 +82,7 @@ export class BookAuthorModel {
     `);
 
     const results = stmt.all(authorId) as { bookId: number }[];
-    return results.map(r => r.bookId);
+    return results.map((r) => r.bookId);
   }
 
   /**
@@ -177,7 +173,7 @@ export class BookAuthorModel {
         const association = this.create({
           bookId,
           authorId: authorIds[i],
-          authorOrder: i
+          authorOrder: i,
         });
         associations.push(association);
       }

@@ -1,12 +1,26 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import SearchBar from '../components/common/SearchBar.vue';
 import BookCard from '../components/books/BookCard.vue';
+import AuthorCard from '../components/authors/AuthorCard.vue';
 import { useBookSearch } from '../composables/useBookSearch';
-import type { BookSearchResult } from '@shared/types/api';
+import type { BookSearchResult, AuthorSearchResult } from '@shared/types/api';
 
-const { results, loading, error, hasResults, hasSearched, hasMore, search, loadMore, importBook } =
-  useBookSearch();
+const router = useRouter();
+
+const {
+  results,
+  loading,
+  error,
+  hasResults,
+  hasSearched,
+  hasMore,
+  search,
+  loadMore,
+  importBook,
+  importAuthor,
+} = useBookSearch();
 
 const importError = ref<string | null>(null);
 
@@ -15,7 +29,7 @@ const handleSearch = async (query: string, type: 'title' | 'author' | 'isbn') =>
   await search(query, type, 1);
 };
 
-const handleImport = async (externalId: string) => {
+const handleBookImport = async (externalId: string) => {
   importError.value = null;
   try {
     await importBook(externalId);
@@ -24,12 +38,30 @@ const handleImport = async (externalId: string) => {
   }
 };
 
+const handleAuthorImport = async (externalId: string) => {
+  importError.value = null;
+  try {
+    await importAuthor(externalId);
+  } catch (err) {
+    importError.value = err instanceof Error ? err.message : 'Failed to import author';
+  }
+};
+
+const handleAuthorView = async (externalId: string) => {
+  // Navigate to author page (will be implemented in T071)
+  router.push(`/authors/${externalId}`);
+};
+
 const handleLoadMore = async () => {
   await loadMore();
 };
 
 const isBookResult = (result: (typeof results.value)[number]): result is BookSearchResult => {
   return result.type === 'book';
+};
+
+const isAuthorResult = (result: (typeof results.value)[number]): result is AuthorSearchResult => {
+  return result.type === 'author';
 };
 </script>
 
@@ -150,19 +182,17 @@ const isBookResult = (result: (typeof results.value)[number]): result is BookSea
               v-if="isBookResult(result)"
               :book="result"
               :loading="loading"
-              @import="handleImport"
+              @import="handleBookImport"
             />
 
-            <!-- Author Results (placeholder for US2) -->
-            <div v-else class="search-page__author-result">
-              <p class="search-page__author-name">{{ result.name }}</p>
-              <p class="search-page__author-books">
-                {{ result.bookCount }} book{{ result.bookCount !== 1 ? 's' : '' }}
-              </p>
-              <p class="search-page__author-note">
-                Author import will be available in a future update
-              </p>
-            </div>
+            <!-- Author Results -->
+            <AuthorCard
+              v-else-if="isAuthorResult(result)"
+              :author="result"
+              :loading="loading"
+              @import="handleAuthorImport"
+              @view="handleAuthorView"
+            />
           </template>
         </div>
 
@@ -373,33 +403,6 @@ const isBookResult = (result: (typeof results.value)[number]): result is BookSea
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.search-page__author-result {
-  padding: 1.5rem;
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-}
-
-.search-page__author-name {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #111827;
-  margin: 0 0 0.25rem 0;
-}
-
-.search-page__author-books {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0 0 0.5rem 0;
-}
-
-.search-page__author-note {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  font-style: italic;
-  margin: 0;
 }
 
 .search-page__load-more {
