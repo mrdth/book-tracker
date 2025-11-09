@@ -59,11 +59,15 @@ export const errors = {
   badRequest: (message: string, details?: unknown) =>
     new AppError(400, 'BAD_REQUEST', message, details),
 
-  notFound: (resource: string) =>
-    new AppError(404, 'NOT_FOUND', `${resource} not found`),
+  validationError: (message: string, details?: unknown) =>
+    new AppError(400, 'VALIDATION_ERROR', message, details),
 
-  conflict: (message: string, details?: unknown) =>
-    new AppError(409, 'CONFLICT', message, details),
+  notFound: (resource: string) => new AppError(404, 'NOT_FOUND', `${resource} not found`),
+
+  notFoundError: (message: string, details?: unknown) =>
+    new AppError(404, 'NOT_FOUND', message, details),
+
+  conflict: (message: string, details?: unknown) => new AppError(409, 'CONFLICT', message, details),
 
   internalError: (message: string, details?: unknown) =>
     new AppError(500, 'INTERNAL_SERVER_ERROR', message, details),

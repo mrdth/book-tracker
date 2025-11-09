@@ -1,62 +1,61 @@
 // Hardcover GraphQL API query definitions
-// Based on specs/001-book-tracker/contracts/hardcover.graphql.md
+// Based on https://docs.hardcover.app/api/
 
 export const SEARCH_BOOKS_BY_TITLE = `
-  query SearchBooksByTitle($title: String!, $limit: Int!, $offset: Int!) {
-    books(
-      where: { title: { _ilike: $title } }
-      limit: $limit
-      offset: $offset
+  query SearchBooksByTitle($query: String!, $per_page: Int!, $page: Int!) {
+    search(
+      query: $query
+      query_type: "Book"
+      per_page: $per_page
+      page: $page
     ) {
-      id
-      title
-      isbn
-      description
-      release_year
-      image
-      authors {
-        id
-        name
-        bio
-        image
-      }
+      results
     }
   }
 `;
 
 export const SEARCH_BOOKS_BY_ISBN = `
-  query SearchBooksByISBN($isbn: String!) {
-    books(where: { isbn: { _eq: $isbn } }) {
-      id
-      title
-      isbn
-      description
-      release_year
-      image
-      authors {
-        id
-        name
-        bio
-        image
-      }
+  query SearchBooksByISBN($query: String!) {
+    search(
+      query: $query
+      query_type: "Book"
+      per_page: 10
+      page: 1
+    ) {
+      results
     }
   }
 `;
 
 export const SEARCH_AUTHORS_BY_NAME = `
-  query SearchAuthorsByName($name: String!, $limit: Int!, $offset: Int!) {
-    authors(
-      where: { name: { _ilike: $name } }
-      limit: $limit
-      offset: $offset
+  query SearchAuthorsByName($query: String!, $per_page: Int!, $page: Int!) {
+    search(
+      query: $query
+      query_type: "Author"
+      per_page: $per_page
+      page: $page
     ) {
+      results
+    }
+  }
+`;
+
+export const GET_BOOK_BY_ID = `
+  query GetBookById($id: Int!) {
+    books_by_pk(id: $id) {
       id
-      name
-      bio
+      title
+      description
+      release_year
       image
-      books_aggregate {
-        aggregate {
-          count
+      isbns
+      contributions(where: {contributor_type: {_eq: "author"}}) {
+        id
+        contributor {
+          id
+          name
+          bio
+          image
         }
       }
     }
@@ -64,76 +63,66 @@ export const SEARCH_AUTHORS_BY_NAME = `
 `;
 
 export const GET_AUTHOR_WITH_BOOKS = `
-  query GetAuthorWithBooks($authorId: ID!) {
-    author(id: $authorId) {
+  query GetAuthorWithBooks($id: Int!) {
+    users_by_pk(id: $id) {
       id
       name
       bio
       image
-      books {
-        id
-        title
-        isbn
-        description
-        release_year
-        image
-        authors {
+      authored_books: contributions(where: {contributor_type: {_eq: "author"}}) {
+        book {
           id
-          name
+          title
+          description
+          release_year
+          image
+          isbns
         }
-      }
-    }
-  }
-`;
-
-export const GET_BOOK_BY_ID = `
-  query GetBookById($bookId: ID!) {
-    book(id: $bookId) {
-      id
-      title
-      isbn
-      description
-      release_year
-      image
-      authors {
-        id
-        name
-        bio
-        image
       }
     }
   }
 `;
 
 export const REFRESH_AUTHOR_BOOKS = `
-  query RefreshAuthorBooks($authorId: ID!) {
-    author(id: $authorId) {
+  query RefreshAuthorBooks($id: Int!) {
+    users_by_pk(id: $id) {
       id
-      books(order_by: { release_year: desc }) {
-        id
-        title
-        isbn
-        description
-        release_year
-        image
-        authors {
+      authored_books: contributions(
+        where: {contributor_type: {_eq: "author"}}
+        order_by: {book: {release_year: desc}}
+      ) {
+        book {
           id
-          name
+          title
+          description
+          release_year
+          image
+          isbns
         }
       }
     }
   }
 `;
 
-// Hardcover API response types
+// Hardcover API response types (based on actual API schema)
 export interface HardcoverBook {
   id: string;
   title: string;
-  isbn: string | null;
+  isbn?: string | string[] | null; // Can be string or array of strings (isbns field)
   description: string | null;
   release_year: number | null;
   image: string | null;
-  authors: HardcoverAuthor[];
+  authors?: HardcoverAuthor[];
+  author_names?: string[]; // Alternative author field
+  isbns?: string[]; // Array of ISBNs
+  contributions?: HardcoverContribution[];
+}
+
+export interface HardcoverContribution {
+  id: string;
+  contributor_type?: string;
+  contributor?: HardcoverAuthor;
+  book?: HardcoverBook;
 }
 
 export interface HardcoverAuthor {
@@ -141,10 +130,12 @@ export interface HardcoverAuthor {
   name: string;
   bio?: string | null;
   image?: string | null;
+  username?: string;
 }
 
 export interface HardcoverAuthorWithBooks extends HardcoverAuthor {
   books?: HardcoverBook[];
+  authored_books?: HardcoverContribution[];
   books_aggregate?: {
     aggregate: {
       count: number;
@@ -158,12 +149,13 @@ export interface SearchBooksResponse {
 
 export interface SearchAuthorsResponse {
   authors: HardcoverAuthorWithBooks[];
+  users?: HardcoverAuthorWithBooks[];
 }
 
 export interface GetBookResponse {
-  book: HardcoverBook;
+  books_by_pk: HardcoverBook;
 }
 
 export interface GetAuthorResponse {
-  author: HardcoverAuthorWithBooks;
+  users_by_pk: HardcoverAuthorWithBooks;
 }

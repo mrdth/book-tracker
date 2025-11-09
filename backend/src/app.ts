@@ -27,12 +27,17 @@ export function createApp(): express.Application {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
-  // API routes will be registered here
-  // TODO: Register routes when they are created
-  // app.use('/api/search', searchRoutes);
-  // app.use('/api/books', booksRoutes);
-  // app.use('/api/authors', authorsRoutes);
-  // app.use('/api/ownership', ownershipRoutes);
+  // API routes
+  // Import routes dynamically to avoid circular dependencies
+  import('./api/routes/search.js').then((module) => {
+    app.use('/api/search', module.default);
+    logger.info('Search routes registered');
+  });
+
+  import('./api/routes/books.js').then((module) => {
+    app.use('/api/books', module.default);
+    logger.info('Books routes registered');
+  });
 
   // Error handling middleware (must be last)
   app.use(errorHandler);
