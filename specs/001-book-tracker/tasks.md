@@ -17,26 +17,26 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create root workspace package.json with workspaces configuration
-- [ ] T002 Create backend/package.json with Express, better-sqlite3, graphql-request, Vite, Vitest, SuperTest dependencies
-- [ ] T003 Create frontend/package.json with Vue 3, Tailwind CSS, Vite, Vitest, Vue Test Utils, graphql-request dependencies
-- [ ] T004 Create shared/package.json with TypeScript type definitions
-- [ ] T005 [P] Configure TypeScript (tsconfig.json) for backend targeting ES2022
-- [ ] T006 [P] Configure TypeScript (tsconfig.json) for frontend targeting ES2022
-- [ ] T007 [P] Configure TypeScript (tsconfig.json) for shared types
-- [ ] T008 [P] Configure ESLint for backend in backend/.eslintrc.json
-- [ ] T009 [P] Configure ESLint for frontend in frontend/.eslintrc.json
-- [ ] T010 [P] Configure Prettier in .prettierrc
-- [ ] T011 [P] Create backend/.env.example with DATABASE_PATH, HARDCOVER_API_URL, HARDCOVER_API_KEY, COLLECTION_ROOT, PORT, LOG_LEVEL
-- [ ] T012 [P] Configure Vite for backend in backend/vite.config.ts
-- [ ] T013 [P] Configure Vite for frontend in frontend/vite.config.ts
-- [ ] T014 [P] Configure Vitest for backend in backend/vitest.config.ts
-- [ ] T015 [P] Configure Vitest for frontend in frontend/vitest.config.ts
-- [ ] T016 [P] Configure Tailwind CSS in frontend/tailwind.config.js
-- [ ] T017 [P] Create backend/src directory structure (models/, services/, api/routes/, api/middleware/, db/, config/)
-- [ ] T018 [P] Create frontend/src directory structure (components/, pages/, services/, router/, stores/, types/, styles/)
-- [ ] T019 [P] Create shared/types directory structure
-- [ ] T020 [P] Create test directory structures (backend/tests/, frontend/tests/)
+- [X] T001 Create root workspace package.json with workspaces configuration
+- [X] T002 Create backend/package.json with Express, better-sqlite3, graphql-request, Vite, Vitest, SuperTest dependencies
+- [X] T003 Create frontend/package.json with Vue 3, Tailwind CSS, Vite, Vitest, Vue Test Utils, graphql-request dependencies
+- [X] T004 Create shared/package.json with TypeScript type definitions
+- [X] T005 [P] Configure TypeScript (tsconfig.json) for backend targeting ES2022
+- [X] T006 [P] Configure TypeScript (tsconfig.json) for frontend targeting ES2022
+- [X] T007 [P] Configure TypeScript (tsconfig.json) for shared types
+- [X] T008 [P] Configure ESLint for backend in backend/eslint.config.js
+- [X] T009 [P] Configure ESLint for frontend in frontend/eslint.config.js
+- [X] T010 [P] Configure Prettier in .prettierrc
+- [X] T011 [P] Create backend/.env.example with DATABASE_PATH, HARDCOVER_API_URL, HARDCOVER_API_KEY, COLLECTION_ROOT, PORT, LOG_LEVEL
+- [X] T012 [P] Configure Vite for backend in backend/vite.config.ts
+- [X] T013 [P] Configure Vite for frontend in frontend/vite.config.ts
+- [X] T014 [P] Configure Vitest for backend in backend/vitest.config.ts
+- [X] T015 [P] Configure Vitest for frontend in frontend/vitest.config.ts
+- [X] T016 [P] Configure Tailwind CSS in frontend/tailwind.config.js
+- [X] T017 [P] Create backend/src directory structure (models/, services/, api/routes/, api/middleware/, db/, config/)
+- [X] T018 [P] Create frontend/src directory structure (components/, pages/, services/, router/, stores/, types/, styles/)
+- [X] T019 [P] Create shared/types directory structure
+- [X] T020 [P] Create test directory structures (backend/tests/, frontend/tests/)
 
 ---
 
