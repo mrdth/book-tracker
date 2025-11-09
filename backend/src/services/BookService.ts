@@ -83,7 +83,7 @@ export class BookService {
 
       for (const hardcoverAuthor of hardcoverAuthors) {
         const author = this.authorModel.findOrCreate({
-          externalId: hardcoverAuthor.id,
+          externalId: String(hardcoverAuthor.id),
           name: hardcoverAuthor.name,
           bio: hardcoverAuthor.bio ?? null,
           photoUrl: hardcoverAuthor.image?.url ?? null,
@@ -104,7 +104,7 @@ export class BookService {
 
       // Create book
       const book = this.bookModel.create({
-        externalId: hardcoverBook.id,
+        externalId: String(hardcoverBook.id),
         title: hardcoverBook.title,
         isbn: isbn,
         description: hardcoverBook.description ?? null,

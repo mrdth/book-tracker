@@ -103,7 +103,7 @@ export class AuthorService {
     const authorId = this.db.transaction(() => {
       // Create author
       const author = this.authorModel.create({
-        externalId: hardcoverAuthor.id,
+        externalId: String(hardcoverAuthor.id),
         name: hardcoverAuthor.name,
         bio: hardcoverAuthor.bio ?? null,
         photoUrl: hardcoverAuthor.image?.url ?? null,
@@ -138,7 +138,7 @@ export class AuthorService {
 
         // Create book
         const book = this.bookModel.create({
-          externalId: hardcoverBook.id,
+          externalId: String(hardcoverBook.id),
           title: hardcoverBook.title,
           isbn: isbn,
           description: hardcoverBook.description ?? null,
@@ -334,7 +334,7 @@ export class AuthorService {
 
         // Create book
         const book = this.bookModel.create({
-          externalId: hardcoverBook.id,
+          externalId: String(hardcoverBook.id),
           title: hardcoverBook.title,
           isbn: isbn,
           description: hardcoverBook.description ?? null,
