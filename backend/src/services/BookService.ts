@@ -7,10 +7,14 @@ import { hardcoverClient } from './HardcoverClient.js';
 import { ownershipScanner } from './OwnershipScanner.js';
 import { logger } from '../config/logger.js';
 import { errors } from '../api/middleware/errorHandler.js';
-import { GET_BOOK_BY_ID } from '../../../shared/src/queries/hardcover.js';
-import type { GetBookResponse, HardcoverBook } from '../../../shared/src/queries/hardcover.js';
-import type { BookWithAuthors } from '../../../shared/src/types/book.js';
-import type { Author } from '../../../shared/src/types/author.js';
+import { GET_BOOK_BY_ID } from '../../../shared/dist/queries/hardcover.js';
+import type {
+  GetBookResponse,
+  HardcoverBook,
+  HardcoverAuthor,
+} from '../../../shared/dist/queries/hardcover.js';
+import type { BookWithAuthors } from '../../../shared/dist/types/book.js';
+import type { Author } from '../../../shared/dist/types/author.js';
 
 export class BookService {
   private db: Database.Database;
@@ -82,7 +86,7 @@ export class BookService {
           externalId: hardcoverAuthor.id,
           name: hardcoverAuthor.name,
           bio: hardcoverAuthor.bio ?? null,
-          photoUrl: hardcoverAuthor.image ?? null,
+          photoUrl: hardcoverAuthor.image?.url ?? null,
         });
         authorIds.push(author.id);
         logger.debug('Author processed for book import', {
@@ -105,7 +109,7 @@ export class BookService {
         isbn: isbn,
         description: hardcoverBook.description ?? null,
         publicationDate: this.transformReleaseYear(hardcoverBook.release_year),
-        coverUrl: hardcoverBook.image ?? null,
+        coverUrl: hardcoverBook.image?.url ?? null,
         owned: owned,
         ownedSource: owned ? 'filesystem' : 'none',
       });
@@ -285,12 +289,19 @@ export class BookService {
    * Handles both isbns array and isbn field
    */
   private extractIsbn(hardcoverBook: HardcoverBook): string | null {
-    // Try isbns array first
+    // Try editions array first (preferred method)
+    if (hardcoverBook.editions && hardcoverBook.editions.length > 0) {
+      const edition = hardcoverBook.editions[0];
+      // Prefer ISBN-13 over ISBN-10
+      return edition.isbn_13 || edition.isbn_10 || null;
+    }
+
+    // Fall back to isbns array (legacy)
     if (hardcoverBook.isbns && hardcoverBook.isbns.length > 0) {
       return hardcoverBook.isbns[0];
     }
 
-    // Fall back to isbn field
+    // Fall back to isbn field (legacy)
     if (hardcoverBook.isbn) {
       if (Array.isArray(hardcoverBook.isbn)) {
         return hardcoverBook.isbn[0] || null;

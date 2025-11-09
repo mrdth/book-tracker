@@ -255,7 +255,7 @@
 ### UI Polish
 
 - [ ] T104 [P] Create loading spinner component in frontend/src/components/common/LoadingSpinner.vue
-- [ ] T105 [P] Create pagination component in frontend/src/components/common/Pagination.vue (50 results per page)
+- [ ] T105 [P] Create pagination component in frontend/src/components/common/Pagination.vue (25 results per page)
 - [ ] T106 Add pagination to SearchPage in frontend/src/pages/SearchPage.vue
 - [ ] T107 Add responsive design styles to all components
 - [ ] T108 Create app header/navigation in frontend/src/components/common/AppHeader.vue

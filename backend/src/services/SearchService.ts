@@ -9,13 +9,13 @@ import {
   SEARCH_BOOKS_BY_TITLE,
   SEARCH_BOOKS_BY_ISBN,
   SEARCH_AUTHORS_BY_NAME,
-} from '../../../shared/src/queries/hardcover.js';
+} from '../../../shared/dist/queries/hardcover.js';
 import type {
   SearchBooksResponse,
   SearchAuthorsResponse,
   HardcoverBook,
   HardcoverAuthorWithBooks,
-} from '../../../shared/src/queries/hardcover.js';
+} from '../../../shared/dist/queries/hardcover.js';
 
 export type SearchType = 'title' | 'author' | 'isbn';
 

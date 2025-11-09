@@ -47,15 +47,21 @@ export const GET_BOOK_BY_ID = `
       title
       description
       release_year
-      image
-      isbns
-      contributions(where: {contributor_type: {_eq: "author"}}) {
-        id
-        contributor {
+      image {
+        url
+      }
+      editions {
+        isbn_10
+        isbn_13
+      }
+      contributions {
+        author {
           id
           name
           bio
-          image
+          image {
+            url
+          }
         }
       }
     }
@@ -68,15 +74,22 @@ export const GET_AUTHOR_WITH_BOOKS = `
       id
       name
       bio
-      image
-      authored_books: contributions(where: {contributor_type: {_eq: "author"}}) {
+      image {
+        url
+      }
+      authored_books: contributions {
         book {
           id
           title
           description
           release_year
-          image
-          isbns
+          image {
+            url
+          }
+          editions {
+            isbn_10
+            isbn_13
+          }
         }
       }
     }
@@ -87,17 +100,19 @@ export const REFRESH_AUTHOR_BOOKS = `
   query RefreshAuthorBooks($id: Int!) {
     users_by_pk(id: $id) {
       id
-      authored_books: contributions(
-        where: {contributor_type: {_eq: "author"}}
-        order_by: {book: {release_year: desc}}
-      ) {
+      authored_books: contributions(order_by: {book: {release_year: desc}}) {
         book {
           id
           title
           description
           release_year
-          image
-          isbns
+          image {
+            url
+          }
+          editions {
+            isbn_10
+            isbn_13
+          }
         }
       }
     }
@@ -105,16 +120,26 @@ export const REFRESH_AUTHOR_BOOKS = `
 `;
 
 // Hardcover API response types (based on actual API schema)
+export interface HardcoverImage {
+  url: string;
+}
+
+export interface HardcoverEdition {
+  isbn_10?: string | null;
+  isbn_13?: string | null;
+}
+
 export interface HardcoverBook {
   id: string;
   title: string;
-  isbn?: string | string[] | null; // Can be string or array of strings (isbns field)
+  isbn?: string | string[] | null; // Legacy field, may still be used in search results
   description: string | null;
   release_year: number | null;
-  image: string | null;
+  image: HardcoverImage | null;
   authors?: HardcoverAuthor[];
   author_names?: string[]; // Alternative author field
-  isbns?: string[]; // Array of ISBNs
+  isbns?: string[]; // Legacy field, may still be used in search results
+  editions?: HardcoverEdition[]; // Preferred way to get ISBNs
   contributions?: HardcoverContribution[];
 }
 
@@ -129,7 +154,7 @@ export interface HardcoverAuthor {
   id: string;
   name: string;
   bio?: string | null;
-  image?: string | null;
+  image?: HardcoverImage | null;
   username?: string;
 }
 
