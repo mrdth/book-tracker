@@ -1,22 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import StatusBadge from '../common/StatusBadge.vue';
+import OwnershipToggle from './OwnershipToggle.vue';
 import type { BookSearchResult } from '@shared/types/api';
 
 interface Props {
   book: BookSearchResult;
+  bookId?: number; // Internal book ID for ownership toggle (only available when book is imported)
   loading?: boolean;
   showDelete?: boolean; // Show delete button for imported books
+  showOwnershipToggle?: boolean; // Show ownership toggle for imported books
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  bookId: undefined,
   loading: false,
   showDelete: false,
+  showOwnershipToggle: false,
 });
 
 const emit = defineEmits<{
   import: [externalId: string];
   delete: [externalId: string];
+  'update-ownership': [bookId: number, owned: boolean];
 }>();
 
 const isImporting = ref(false);
@@ -74,6 +80,19 @@ const canImport = (): boolean => {
 const canDelete = (): boolean => {
   return (
     props.showDelete && props.book.status === 'imported' && !isDeleting.value && !props.loading
+  );
+};
+
+const handleOwnershipUpdate = (bookId: number, owned: boolean) => {
+  emit('update-ownership', bookId, owned);
+};
+
+const canShowOwnershipToggle = (): boolean => {
+  return (
+    props.showOwnershipToggle &&
+    props.book.status === 'imported' &&
+    props.bookId !== undefined &&
+    !props.loading
   );
 };
 </script>
@@ -209,11 +228,22 @@ const canDelete = (): boolean => {
         <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
       </button>
 
+      <OwnershipToggle
+        v-if="canShowOwnershipToggle()"
+        :book-id="bookId!"
+        :owned="book.owned"
+        :disabled="loading"
+        @update="handleOwnershipUpdate"
+      />
+
       <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
         This book was previously deleted
       </div>
 
-      <div v-else-if="book.owned && !showDelete" class="book-card__imported-message">
+      <div
+        v-else-if="book.owned && !showDelete && !showOwnershipToggle"
+        class="book-card__imported-message"
+      >
         Already in your library
       </div>
     </div>

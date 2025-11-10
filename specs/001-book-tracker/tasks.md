@@ -241,10 +241,10 @@
 
 ### Manual Ownership Override
 
-- [ ] T097 Add manual ownership override to PATCH /api/books/:id in backend/src/api/routes/books.ts
-- [ ] T098 Update BookService to handle manual ownership source in backend/src/services/BookService.ts
-- [ ] T099 [P] Create OwnershipToggle component in frontend/src/components/books/OwnershipToggle.vue (button to manually mark as owned)
-- [ ] T100 Add OwnershipToggle to BookCard in frontend/src/components/books/BookCard.vue
+- [X] T097 Add manual ownership override to PATCH /api/books/:id in backend/src/api/routes/books.ts
+- [X] T098 Update BookService to handle manual ownership source in backend/src/services/BookService.ts
+- [X] T099 [P] Create OwnershipToggle component in frontend/src/components/books/OwnershipToggle.vue (button to manually mark as owned)
+- [X] T100 Add OwnershipToggle to BookCard in frontend/src/components/books/BookCard.vue
 
 ### Error Handling & Validation
 

@@ -241,6 +241,16 @@ const handleDeleteBook = async (bookId: number) => {
   }
 };
 
+const handleOwnershipUpdate = async (bookId: number, owned: boolean) => {
+  try {
+    await apiClient.updateBook(bookId, { owned });
+    await loadAuthor(); // Reload to update ownership status
+  } catch (err) {
+    console.error('Failed to update book ownership:', err);
+    alert(err instanceof Error ? err.message : 'Failed to update ownership');
+  }
+};
+
 onMounted(() => {
   loadAuthor();
 });
@@ -507,8 +517,11 @@ onMounted(() => {
               <div class="book-item__content">
                 <BookCard
                   :book="convertBookToSearchResult(book)"
+                  :book-id="book.id"
                   :show-delete="!isBulkMode"
+                  :show-ownership-toggle="!isBulkMode"
                   @delete="handleDeleteBook(book.id)"
+                  @update-ownership="handleOwnershipUpdate"
                 />
               </div>
             </div>
