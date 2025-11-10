@@ -164,23 +164,23 @@
 
 ### Backend Implementation for US3
 
-- [ ] T074 [US3] Create PATCH /api/authors/:id endpoint in backend/src/api/routes/authors.ts (update author bio/name/photo)
-- [ ] T075 [US3] Create POST /api/authors/:id/refresh endpoint in backend/src/api/routes/authors.ts (fetch latest books from Hardcover API)
-- [ ] T076 [US3] Create PATCH /api/books/bulk endpoint in backend/src/api/routes/books.ts (bulk update ownership/deletion)
-- [ ] T077 [US3] Add refresh logic to AuthorService in backend/src/services/AuthorService.ts (compare API books with local, import new, skip deleted)
-- [ ] T078 [US3] Add bulk update logic to BookService in backend/src/services/BookService.ts (validate book IDs, update multiple records in transaction)
+- [X] T074 [US3] Create PATCH /api/authors/:id endpoint in backend/src/api/routes/authors.ts (update author bio/name/photo)
+- [X] T075 [US3] Create POST /api/authors/:id/refresh endpoint in backend/src/api/routes/authors.ts (fetch latest books from Hardcover API)
+- [X] T076 [US3] Create PATCH /api/books/bulk endpoint in backend/src/api/routes/books.ts (bulk update ownership/deletion)
+- [X] T077 [US3] Add refresh logic to AuthorService in backend/src/services/AuthorService.ts (compare API books with local, import new, skip deleted)
+- [X] T078 [US3] Add bulk update logic to BookService in backend/src/services/BookService.ts (validate book IDs, update multiple records in transaction)
 
 ### Frontend Implementation for US3
 
-- [ ] T079 [P] [US3] Create EditAuthorModal component in frontend/src/components/authors/EditAuthorModal.vue (form for editing author info)
-- [ ] T080 [P] [US3] Create BulkActionBar component in frontend/src/components/books/BulkActionBar.vue (checkboxes, select all, bulk action buttons)
-- [ ] T081 [US3] Add edit mode to AuthorPage in frontend/src/pages/AuthorPage.vue (edit button, modal integration)
-- [ ] T082 [US3] Add refresh functionality to AuthorPage in frontend/src/pages/AuthorPage.vue (refresh button, loading state)
-- [ ] T083 [US3] Add bulk action mode to AuthorPage in frontend/src/pages/AuthorPage.vue (enable/disable bulk mode, selection state)
+- [X] T079 [P] [US3] Create EditAuthorModal component in frontend/src/components/authors/EditAuthorModal.vue (form for editing author info)
+- [X] T080 [P] [US3] Create BulkActionBar component in frontend/src/components/books/BulkActionBar.vue (checkboxes, select all, bulk action buttons)
+- [X] T081 [US3] Add edit mode to AuthorPage in frontend/src/pages/AuthorPage.vue (edit button, modal integration)
+- [X] T082 [US3] Add refresh functionality to AuthorPage in frontend/src/pages/AuthorPage.vue (refresh button, loading state)
+- [X] T083 [US3] Add bulk action mode to AuthorPage in frontend/src/pages/AuthorPage.vue (enable/disable bulk mode, selection state)
 
 ### Integration for US3
 
-- [ ] T084 [US3] Add comprehensive logging to all US3 services (author updates, API refreshes, bulk operations)
+- [X] T084 [US3] Add comprehensive logging to all US3 services (author updates, API refreshes, bulk operations)
 
 **Checkpoint**: All user stories 1, 2, and 3 should now be independently functional
 

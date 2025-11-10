@@ -91,9 +91,7 @@ const canImport = (): boolean => {
       <p class="book-card__author">{{ getAuthorNames() }}</p>
 
       <div class="book-card__metadata">
-        <span v-if="book.isbn" class="book-card__metadata-item">
-          ISBN: {{ book.isbn }}
-        </span>
+        <span v-if="book.isbn" class="book-card__metadata-item"> ISBN: {{ book.isbn }} </span>
         <span class="book-card__metadata-item">
           {{ formatPublicationDate(book.publicationDate) }}
         </span>
@@ -115,11 +113,7 @@ const canImport = (): boolean => {
           stroke="currentColor"
           class="book-card__button-icon"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
         <svg
           v-else
@@ -149,9 +143,7 @@ const canImport = (): boolean => {
         This book was previously deleted
       </div>
 
-      <div v-else-if="book.status === 'imported'" class="book-card__imported-message">
-        Already in your library
-      </div>
+      <div v-else-if="book.owned" class="book-card__imported-message">Already in your library</div>
     </div>
   </div>
 </template>
@@ -168,7 +160,9 @@ const canImport = (): boolean => {
 }
 
 .book-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .book-card__image-container {

@@ -20,6 +20,7 @@ export interface BookSearchResult {
     name: string;
   }>;
   status: 'not_imported' | 'imported' | 'deleted';
+  owned: boolean;
 }
 
 export interface AuthorSearchResult {
