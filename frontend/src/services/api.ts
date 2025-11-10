@@ -104,10 +104,16 @@ class ApiClient {
   }
 
   // Ownership
-  async triggerOwnershipScan(): Promise<{ scanned: number }> {
-    return this.request<{ scanned: number }>('/ownership/scan', {
-      method: 'POST',
-    });
+  async triggerOwnershipScan(
+    forceRefresh: boolean = false
+  ): Promise<{ scannedBooks: number; ownedBooks: number; updatedCount: number }> {
+    const endpoint = forceRefresh ? '/ownership/scan?forceRefresh=true' : '/ownership/scan';
+    return this.request<{ scannedBooks: number; ownedBooks: number; updatedCount: number }>(
+      endpoint,
+      {
+        method: 'POST',
+      }
+    );
   }
 }
 

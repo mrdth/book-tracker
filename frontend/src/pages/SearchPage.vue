@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import SearchBar from '../components/common/SearchBar.vue';
 import BookCard from '../components/books/BookCard.vue';
 import AuthorCard from '../components/authors/AuthorCard.vue';
+import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
 import { useBookSearch } from '../composables/useBookSearch';
 import type { BookSearchResult, AuthorSearchResult } from '@shared/types/api';
 
@@ -79,6 +80,11 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
       <!-- Search Bar -->
       <div class="search-page__search">
         <SearchBar @search="handleSearch" :disabled="loading" />
+      </div>
+
+      <!-- Ownership Scanner -->
+      <div class="search-page__ownership">
+        <OwnershipScanPanel />
       </div>
 
       <!-- Import Error -->
@@ -273,6 +279,10 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
 }
 
 .search-page__search {
+  margin-bottom: 2rem;
+}
+
+.search-page__ownership {
   margin-bottom: 2rem;
 }
 
