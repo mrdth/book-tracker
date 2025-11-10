@@ -77,7 +77,10 @@ export const GET_AUTHOR_WITH_BOOKS = `
       image {
         url
       }
-      contributions {
+      contributions(where: {
+        contributable_type: {_eq: "Book"},
+        book: {state: {_nin: ["duplicate", "pending"]}}
+      }) {
         book {
           id
           title

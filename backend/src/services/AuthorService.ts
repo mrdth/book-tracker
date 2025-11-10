@@ -117,6 +117,14 @@ export class AuthorService {
 
       // Import each book
       for (const hardcoverBook of hardcoverBooks) {
+        if (!hardcoverBook.title) {
+          logger.error('Book without title', {
+            title: hardcoverBook.id,
+            authorName: hardcoverAuthor.name,
+          });
+          continue;
+        }
+
         // FR-028: Check for duplicate by author name + book title
         const skipReason = this.checkIfBookShouldBeSkipped(
           hardcoverAuthor.name,
