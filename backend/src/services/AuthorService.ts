@@ -313,7 +313,7 @@ export class AuthorService {
 
     this.db.transaction(() => {
       for (const hardcoverBook of hardcoverBooks) {
-        const skipReason = this.checkIfBookShouldBeSkipped(hardcoverBook.id);
+        const skipReason = this.checkIfBookShouldBeSkipped(String(hardcoverBook.id));
 
         if (skipReason) {
           skippedBookCount++;
@@ -387,7 +387,6 @@ export class AuthorService {
    */
   private checkIfBookShouldBeSkipped(externalId: string): string | null {
     const existingBook = this.bookModel.findByExternalId(externalId);
-
     if (!existingBook) {
       return null; // Book doesn't exist, should be imported
     }
