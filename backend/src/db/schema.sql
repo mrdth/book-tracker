@@ -33,8 +33,7 @@ CREATE TABLE IF NOT EXISTS books (
   CHECK(length(title) > 0),
   CHECK(owned IN (0, 1)),
   CHECK(deleted IN (0, 1)),
-  CHECK(owned_source IN ('none', 'filesystem', 'manual')),
-  CHECK(owned_source != 'manual' OR owned = 1)
+  CHECK(owned_source IN ('none', 'filesystem', 'manual'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_books_external_id ON books(external_id);
