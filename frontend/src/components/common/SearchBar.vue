@@ -10,7 +10,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
-  searchType: 'title',
+  searchType: 'author',
   placeholder: 'Search books...',
   disabled: false,
 });
@@ -68,8 +68,8 @@ const getPlaceholder = () => {
         class="search-bar__type-select"
         aria-label="Search type"
       >
-        <option value="title">Title</option>
         <option value="author">Author</option>
+        <option value="title">Title</option>
         <option value="isbn">ISBN</option>
       </select>
 
