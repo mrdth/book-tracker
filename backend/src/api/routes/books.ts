@@ -62,52 +62,6 @@ router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 /**
- * PATCH /api/books/:id
- * Update book ownership or deletion status
- */
-router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const bookId = parseInt(req.params.id, 10);
-
-    if (isNaN(bookId) || bookId < 1) {
-      throw errors.validationError('Book ID must be a positive integer');
-    }
-
-    const { owned, deleted } = req.body;
-
-    logger.info('Book update request received', {
-      bookId,
-      owned,
-      deleted,
-      ip: req.ip,
-    });
-
-    // Handle deletion
-    if (deleted === true) {
-      const book = bookService.deleteBook(bookId);
-      logger.info('Book deleted', { bookId, title: book.title });
-      return res.status(200).json(book);
-    }
-
-    // Handle ownership update
-    if (typeof owned === 'boolean') {
-      const book = bookService.updateOwnership(bookId, owned, true); // true = manual override
-      logger.info('Book ownership updated', {
-        bookId,
-        owned: book.owned,
-        ownedSource: book.ownedSource,
-      });
-      return res.status(200).json(book);
-    }
-
-    // No valid update provided
-    throw errors.validationError('Request must include either "owned" (boolean) or "deleted" (boolean)');
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
  * PATCH /api/books/bulk
  * Bulk update books (ownership or deletion)
  */
@@ -148,6 +102,54 @@ router.patch('/bulk', async (req: Request, res: Response, next: NextFunction) =>
       updatedCount: updatedBooks.length,
       updatedBooks,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * PATCH /api/books/:id
+ * Update book ownership or deletion status
+ */
+router.patch('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const bookId = parseInt(req.params.id, 10);
+
+    if (isNaN(bookId) || bookId < 1) {
+      throw errors.validationError('Book ID must be a positive integer');
+    }
+
+    const { owned, deleted } = req.body;
+
+    logger.info('Book update request received', {
+      bookId,
+      owned,
+      deleted,
+      ip: req.ip,
+    });
+
+    // Handle deletion
+    if (deleted === true) {
+      const book = bookService.deleteBook(bookId);
+      logger.info('Book deleted', { bookId, title: book.title });
+      return res.status(200).json(book);
+    }
+
+    // Handle ownership update
+    if (typeof owned === 'boolean') {
+      const book = bookService.updateOwnership(bookId, owned, true); // true = manual override
+      logger.info('Book ownership updated', {
+        bookId,
+        owned: book.owned,
+        ownedSource: book.ownedSource,
+      });
+      return res.status(200).json(book);
+    }
+
+    // No valid update provided
+    throw errors.validationError(
+      'Request must include either "owned" (boolean) or "deleted" (boolean)'
+    );
   } catch (error) {
     next(error);
   }
