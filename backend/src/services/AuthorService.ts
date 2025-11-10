@@ -117,7 +117,12 @@ export class AuthorService {
 
       // Import each book
       for (const hardcoverBook of hardcoverBooks) {
-        const skipReason = this.checkIfBookShouldBeSkipped(hardcoverBook.id);
+        // FR-028: Check for duplicate by author name + book title
+        const skipReason = this.checkIfBookShouldBeSkipped(
+          hardcoverAuthor.name,
+          hardcoverBook.title,
+          String(hardcoverBook.id)
+        );
 
         if (skipReason) {
           skippedBookCount++;
@@ -125,6 +130,7 @@ export class AuthorService {
           logger.debug('Skipping book during author import', {
             bookExternalId: hardcoverBook.id,
             title: hardcoverBook.title,
+            authorName: hardcoverAuthor.name,
             reason: skipReason,
           });
           continue;
@@ -313,7 +319,12 @@ export class AuthorService {
 
     this.db.transaction(() => {
       for (const hardcoverBook of hardcoverBooks) {
-        const skipReason = this.checkIfBookShouldBeSkipped(String(hardcoverBook.id));
+        // FR-028: Check for duplicate by author name + book title
+        const skipReason = this.checkIfBookShouldBeSkipped(
+          author.name,
+          hardcoverBook.title,
+          String(hardcoverBook.id)
+        );
 
         if (skipReason) {
           skippedBookCount++;
@@ -321,6 +332,7 @@ export class AuthorService {
           logger.debug('Skipping book during author refresh', {
             bookExternalId: hardcoverBook.id,
             title: hardcoverBook.title,
+            authorName: author.name,
             reason: skipReason,
           });
           continue;
@@ -383,19 +395,36 @@ export class AuthorService {
 
   /**
    * Check if a book should be skipped during import
+   * Per FR-028: Checks by author name + book title (primary), then external_id (fallback)
    * Returns skip reason or null if book should be imported
    */
-  private checkIfBookShouldBeSkipped(externalId: string): string | null {
-    const existingBook = this.bookModel.findByExternalId(externalId);
-    if (!existingBook) {
-      return null; // Book doesn't exist, should be imported
+  private checkIfBookShouldBeSkipped(
+    authorName: string,
+    bookTitle: string,
+    externalId: string
+  ): string | null {
+    // FR-028: Primary check by author name + book title (case-insensitive)
+    const existingByAuthorTitle = this.bookModel.findByAuthorNameAndTitle(authorName, bookTitle);
+
+    if (existingByAuthorTitle) {
+      if (existingByAuthorTitle.deleted) {
+        return 'previously deleted';
+      }
+      return 'already imported';
     }
 
-    if (existingBook.deleted) {
-      return 'previously deleted';
+    // Fallback: Also check by external_id for safety
+    // (in case of data inconsistencies or API changes)
+    const existingByExternalId = this.bookModel.findByExternalId(externalId);
+
+    if (existingByExternalId) {
+      if (existingByExternalId.deleted) {
+        return 'previously deleted';
+      }
+      return 'already imported';
     }
 
-    return 'already imported';
+    return null; // Book doesn't exist, should be imported
   }
 
   /**

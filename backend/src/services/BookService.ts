@@ -32,30 +32,14 @@ export class BookService {
   /**
    * Import a book from Hardcover API by external ID
    * Includes ownership detection from filesystem
+   * Per FR-028: Checks for duplicates by author name + book title
    */
   async importBook(externalId: string): Promise<BookWithAuthors> {
     logger.info('Starting book import', { externalId });
 
-    // Check if book already exists
-    const existing = this.bookModel.findByExternalId(externalId);
-    if (existing) {
-      if (existing.deleted) {
-        logger.warn('Attempted to import deleted book', { externalId, bookId: existing.id });
-        throw errors.validationError('This book was previously deleted and cannot be re-imported', {
-          externalId,
-          bookId: existing.id,
-        });
-      }
-
-      logger.info('Book already imported', { externalId, bookId: existing.id });
-      throw errors.validationError('Book already imported', {
-        externalId,
-        bookId: existing.id,
-      });
-    }
-
-    // Fetch book from Hardcover API
+    // Fetch book from Hardcover API first to get author and title
     let hardcoverBook: HardcoverBook;
+    let hardcoverAuthors: HardcoverAuthor[];
     try {
       const response = await hardcoverClient.request<GetBookResponse>(GET_BOOK_BY_ID, {
         id: parseInt(externalId, 10),
@@ -66,20 +50,66 @@ export class BookService {
         throw errors.notFoundError('Book not found in Hardcover API', { externalId });
       }
 
+      // Extract authors
+      hardcoverAuthors = this.extractAuthors(hardcoverBook);
+
       logger.info('Book fetched from Hardcover API', {
         externalId,
         title: hardcoverBook.title,
+        authorCount: hardcoverAuthors.length,
       });
     } catch (error) {
       logger.error('Failed to fetch book from Hardcover API', error, { externalId });
       throw error;
     }
 
+    // FR-028: Check for duplicate by author name + book title (case-insensitive)
+    // This is the PRIMARY uniqueness check
+    if (hardcoverAuthors.length > 0) {
+      const primaryAuthor = hardcoverAuthors[0];
+      const existingByAuthorTitle = this.bookModel.findByAuthorNameAndTitle(
+        primaryAuthor.name,
+        hardcoverBook.title
+      );
+
+      if (existingByAuthorTitle) {
+        if (existingByAuthorTitle.deleted) {
+          logger.warn('Attempted to import deleted book (matched by author+title)', {
+            externalId,
+            existingBookId: existingByAuthorTitle.id,
+            existingExternalId: existingByAuthorTitle.externalId,
+            authorName: primaryAuthor.name,
+            title: hardcoverBook.title,
+          });
+          throw errors.validationError(
+            'This book was previously deleted and cannot be re-imported',
+            {
+              externalId,
+              existingBookId: existingByAuthorTitle.id,
+              existingExternalId: existingByAuthorTitle.externalId,
+            }
+          );
+        }
+
+        logger.info('Book already imported (matched by author+title)', {
+          externalId,
+          existingBookId: existingByAuthorTitle.id,
+          existingExternalId: existingByAuthorTitle.externalId,
+          authorName: primaryAuthor.name,
+          title: hardcoverBook.title,
+        });
+        throw errors.validationError('Book already imported', {
+          externalId,
+          existingBookId: existingByAuthorTitle.id,
+          existingExternalId: existingByAuthorTitle.externalId,
+        });
+      }
+    }
+
     // Import book with authors in transaction
     const bookWithAuthors = this.db.transaction(() => {
       // Extract authors from contributions or authors field
       const authorIds: number[] = [];
-      const hardcoverAuthors = this.extractAuthors(hardcoverBook);
 
       for (const hardcoverAuthor of hardcoverAuthors) {
         const author = this.authorModel.findOrCreate({

@@ -259,7 +259,7 @@ export class BookModel {
       LIMIT ? OFFSET ?
     `);
 
-    return (stmt.all(limit, offset) as any[]).map(row => this.mapRowToBook(row));
+    return (stmt.all(limit, offset) as any[]).map((row) => this.mapRowToBook(row));
   }
 
   /**
@@ -288,7 +288,7 @@ export class BookModel {
       ORDER BY b.publication_date DESC, b.title ASC
     `);
 
-    return (stmt.all(authorId) as any[]).map(row => this.mapRowToBook(row));
+    return (stmt.all(authorId) as any[]).map((row) => this.mapRowToBook(row));
   }
 
   /**
@@ -304,7 +304,7 @@ export class BookModel {
   markOwned(id: number, manual: boolean = true): Book {
     return this.update(id, {
       owned: true,
-      ownedSource: manual ? 'manual' : 'filesystem'
+      ownedSource: manual ? 'manual' : 'filesystem',
     });
   }
 
@@ -411,6 +411,38 @@ export class BookModel {
   }
 
   /**
+   * Find book by author name and book title (case-insensitive)
+   * Per FR-028: Book uniqueness is based on author name + book title combination
+   */
+  findByAuthorNameAndTitle(authorName: string, bookTitle: string): Book | null {
+    const stmt = this.db.prepare(`
+      SELECT
+        b.id,
+        b.external_id as externalId,
+        b.title,
+        b.isbn,
+        b.description,
+        b.publication_date as publicationDate,
+        b.cover_url as coverUrl,
+        CASE WHEN b.owned = 1 THEN 1 ELSE 0 END as owned,
+        b.owned_source as ownedSource,
+        CASE WHEN b.deleted = 1 THEN 1 ELSE 0 END as deleted,
+        b.created_at as createdAt,
+        b.updated_at as updatedAt
+      FROM books b
+      JOIN book_authors ba ON b.id = ba.book_id
+      JOIN authors a ON ba.author_id = a.id
+      WHERE LOWER(a.name) = LOWER(?) AND LOWER(b.title) = LOWER(?)
+      LIMIT 1
+    `);
+
+    const row = stmt.get(authorName, bookTitle) as any;
+    if (!row) return null;
+
+    return this.mapRowToBook(row);
+  }
+
+  /**
    * Map database row to Book object
    */
   private mapRowToBook(row: any): Book {
@@ -426,7 +458,7 @@ export class BookModel {
       ownedSource: row.ownedSource as OwnedSource,
       deleted: Boolean(row.deleted),
       createdAt: row.createdAt,
-      updatedAt: row.updatedAt
+      updatedAt: row.updatedAt,
     };
   }
 }
