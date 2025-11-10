@@ -194,12 +194,12 @@
 
 ### Backend Implementation for US4
 
-- [ ] T085 [US4] Add ISBN search to SearchService in backend/src/services/SearchService.ts (query Hardcover API by ISBN)
+- [X] T085 [US4] Add ISBN search to SearchService in backend/src/services/SearchService.ts (query Hardcover API by ISBN)
 
 ### Frontend Implementation for US4
 
-- [ ] T086 [US4] Update SearchBar component to support ISBN search type in frontend/src/components/common/SearchBar.vue
-- [ ] T087 [US4] Update SearchPage to handle ISBN results in frontend/src/pages/SearchPage.vue
+- [X] T086 [US4] Update SearchBar component to support ISBN search type in frontend/src/components/common/SearchBar.vue
+- [X] T087 [US4] Update SearchPage to handle ISBN results in frontend/src/pages/SearchPage.vue
 
 **Checkpoint**: ISBN search should work independently
 
