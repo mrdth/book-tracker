@@ -236,8 +236,8 @@
 
 **Note**: OwnershipScanner service (T035) is foundational and used throughout user stories. These tasks add a manual trigger endpoint for convenience.
 
-- [ ] T095 [P] Create POST /api/ownership/scan endpoint in backend/src/api/routes/ownership.ts (trigger manual filesystem scan)
-- [ ] T096 Add ownership routes to Express app in backend/src/app.ts
+- [X] T095 [P] Create POST /api/ownership/scan endpoint in backend/src/api/routes/ownership.ts (trigger manual filesystem scan)
+- [X] T096 Add ownership routes to Express app in backend/src/app.ts
 
 ### Manual Ownership Override
 

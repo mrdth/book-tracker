@@ -44,6 +44,11 @@ export function createApp(): express.Application {
     logger.info('Authors routes registered');
   });
 
+  import('./api/routes/ownership.js').then((module) => {
+    app.use('/api/ownership', module.default);
+    logger.info('Ownership routes registered');
+  });
+
   // Error handling middleware (must be last)
   app.use(errorHandler);
 
