@@ -6,17 +6,21 @@ import type { BookSearchResult } from '@shared/types/api';
 interface Props {
   book: BookSearchResult;
   loading?: boolean;
+  showDelete?: boolean; // Show delete button for imported books
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
+  showDelete: false,
 });
 
 const emit = defineEmits<{
   import: [externalId: string];
+  delete: [externalId: string];
 }>();
 
 const isImporting = ref(false);
+const isDeleting = ref(false);
 
 const handleImport = async () => {
   if (props.book.status !== 'not_imported' || isImporting.value) {
@@ -49,8 +53,28 @@ const getAuthorNames = (): string => {
   return `${props.book.authors[0].name} & ${props.book.authors.length - 1} others`;
 };
 
+const handleDelete = async () => {
+  if (isDeleting.value) return;
+
+  isDeleting.value = true;
+  try {
+    emit('delete', props.book.externalId);
+  } finally {
+    // Keep loading state until parent component updates
+    setTimeout(() => {
+      isDeleting.value = false;
+    }, 500);
+  }
+};
+
 const canImport = (): boolean => {
   return props.book.status === 'not_imported' && !isImporting.value && !props.loading;
+};
+
+const canDelete = (): boolean => {
+  return (
+    props.showDelete && props.book.status === 'imported' && !isDeleting.value && !props.loading
+  );
 };
 </script>
 
@@ -139,11 +163,59 @@ const canImport = (): boolean => {
         <span>{{ isImporting ? 'Importing...' : 'Import' }}</span>
       </button>
 
+      <button
+        v-if="canDelete()"
+        @click="handleDelete"
+        :disabled="isDeleting || loading"
+        class="book-card__delete-button"
+        :aria-label="`Delete ${book.title}`"
+      >
+        <svg
+          v-if="!isDeleting"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="book-card__button-icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+          />
+        </svg>
+        <svg
+          v-else
+          class="book-card__button-icon book-card__spinner"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
+      </button>
+
       <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
         This book was previously deleted
       </div>
 
-      <div v-else-if="book.owned" class="book-card__imported-message">Already in your library</div>
+      <div v-else-if="book.owned && !showDelete" class="book-card__imported-message">
+        Already in your library
+      </div>
     </div>
   </div>
 </template>
@@ -244,21 +316,25 @@ const canImport = (): boolean => {
   align-items: center;
 }
 
-.book-card__import-button {
+.book-card__import-button,
+.book-card__delete-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   align-self: flex-start;
   padding: 0.5rem 1rem;
   margin-top: 0.5rem;
-  background-color: #3b82f6;
-  color: white;
   border: none;
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.book-card__import-button {
+  background-color: #3b82f6;
+  color: white;
 }
 
 .book-card__import-button:hover:not(:disabled) {
@@ -271,6 +347,25 @@ const canImport = (): boolean => {
 }
 
 .book-card__import-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.book-card__delete-button {
+  background-color: #ef4444;
+  color: white;
+}
+
+.book-card__delete-button:hover:not(:disabled) {
+  background-color: #dc2626;
+}
+
+.book-card__delete-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+.book-card__delete-button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
 }

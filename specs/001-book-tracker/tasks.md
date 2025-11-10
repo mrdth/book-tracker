@@ -213,16 +213,16 @@
 
 ### Backend Implementation for US5
 
-- [ ] T088 [US5] Create PATCH /api/books/:id endpoint in backend/src/api/routes/books.ts (update book deletion status)
-- [ ] T089 [US5] Add deletion logic to BookService in backend/src/services/BookService.ts (soft delete, prevent re-import)
-- [ ] T090 [US5] Update SearchService to include deleted books in results with indicator in backend/src/services/SearchService.ts
-- [ ] T091 [US5] Update AuthorService to filter deleted books from author pages in backend/src/services/AuthorService.ts
+- [X] T088 [US5] Create PATCH /api/books/:id endpoint in backend/src/api/routes/books.ts (update book deletion status)
+- [X] T089 [US5] Add deletion logic to BookService in backend/src/services/BookService.ts (soft delete, prevent re-import)
+- [X] T090 [US5] Update SearchService to include deleted books in results with indicator in backend/src/services/SearchService.ts
+- [X] T091 [US5] Update AuthorService to filter deleted books from author pages in backend/src/services/AuthorService.ts
 
 ### Frontend Implementation for US5
 
-- [ ] T092 [P] [US5] Add delete button to BookCard component in frontend/src/components/books/BookCard.vue
-- [ ] T093 [US5] Update StatusBadge to show "Deleted" indicator in frontend/src/components/common/StatusBadge.vue
-- [ ] T094 [US5] Update AuthorPage to filter deleted books in frontend/src/pages/AuthorPage.vue
+- [X] T092 [P] [US5] Add delete button to BookCard component in frontend/src/components/books/BookCard.vue
+- [X] T093 [US5] Update StatusBadge to show "Deleted" indicator in frontend/src/components/common/StatusBadge.vue
+- [X] T094 [US5] Update AuthorPage to filter deleted books in frontend/src/pages/AuthorPage.vue
 
 **Checkpoint**: Soft deletion should work across all views
 

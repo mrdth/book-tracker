@@ -227,6 +227,20 @@ const handleBulkDelete = async () => {
   }
 };
 
+const handleDeleteBook = async (bookId: number) => {
+  if (!confirm('Delete this book? It will be marked as deleted but not permanently removed.')) {
+    return;
+  }
+
+  try {
+    await apiClient.updateBook(bookId, { deleted: true });
+    await loadAuthor(); // Reload to remove deleted book from list
+  } catch (err) {
+    console.error('Failed to delete book:', err);
+    alert(err instanceof Error ? err.message : 'Failed to delete book');
+  }
+};
+
 onMounted(() => {
   loadAuthor();
 });
@@ -491,7 +505,11 @@ onMounted(() => {
                 />
               </label>
               <div class="book-item__content">
-                <BookCard :book="convertBookToSearchResult(book)" />
+                <BookCard
+                  :book="convertBookToSearchResult(book)"
+                  :show-delete="!isBulkMode"
+                  @delete="handleDeleteBook(book.id)"
+                />
               </div>
             </div>
           </div>
