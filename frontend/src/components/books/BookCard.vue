@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import StatusBadge from '../common/StatusBadge.vue';
-import OwnershipToggle from './OwnershipToggle.vue';
 import type { BookSearchResult } from '@shared/types/api';
 
 interface Props {
@@ -27,6 +26,7 @@ const emit = defineEmits<{
 
 const isImporting = ref(false);
 const isDeleting = ref(false);
+const showOwnershipDropdown = ref(false);
 
 const handleImport = async () => {
   if (props.book.status !== 'not_imported' || isImporting.value) {
@@ -83,8 +83,20 @@ const canDelete = (): boolean => {
   );
 };
 
-const handleOwnershipUpdate = (bookId: number, owned: boolean) => {
-  emit('update-ownership', bookId, owned);
+const toggleOwnershipDropdown = () => {
+  showOwnershipDropdown.value = !showOwnershipDropdown.value;
+};
+
+const closeOwnershipDropdown = () => {
+  showOwnershipDropdown.value = false;
+};
+
+const handleToggleOwnership = () => {
+  if (props.bookId === undefined) return;
+
+  const newOwned = !props.book.owned;
+  emit('update-ownership', props.bookId, newOwned);
+  closeOwnershipDropdown();
 };
 
 const canShowOwnershipToggle = (): boolean => {
@@ -182,59 +194,95 @@ const canShowOwnershipToggle = (): boolean => {
         <span>{{ isImporting ? 'Importing...' : 'Import' }}</span>
       </button>
 
-      <button
-        v-if="canDelete()"
-        @click="handleDelete"
-        :disabled="isDeleting || loading"
-        class="book-card__delete-button"
-        :aria-label="`Delete ${book.title}`"
-      >
-        <svg
-          v-if="!isDeleting"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="book-card__button-icon"
+      <!-- Action buttons row -->
+      <div v-if="canDelete() || canShowOwnershipToggle()" class="book-card__actions">
+        <button
+          v-if="canDelete()"
+          @click="handleDelete"
+          :disabled="isDeleting || loading"
+          class="book-card__delete-button"
+          :aria-label="`Delete ${book.title}`"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-          />
-        </svg>
-        <svg
-          v-else
-          class="book-card__button-icon book-card__spinner"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
+          <svg
+            v-if="!isDeleting"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
             stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
-      </button>
+            class="book-card__button-icon"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+          <svg
+            v-else
+            class="book-card__button-icon book-card__spinner"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
+        </button>
 
-      <OwnershipToggle
-        v-if="canShowOwnershipToggle()"
-        :book-id="bookId!"
-        :owned="book.owned"
-        :disabled="loading"
-        @update="handleOwnershipUpdate"
-      />
+        <!-- Ownership dropdown button -->
+        <div v-if="canShowOwnershipToggle()" class="book-card__ownership-dropdown">
+          <button
+            @click="toggleOwnershipDropdown"
+            :disabled="loading"
+            class="book-card__ownership-button"
+            :class="{ 'book-card__ownership-button--owned': book.owned }"
+            :aria-label="`Ownership status: ${book.owned ? 'Owned' : 'Not Owned'}`"
+          >
+            <span>{{ book.owned ? 'Owned' : 'Not Owned' }}</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="book-card__dropdown-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </button>
+
+          <!-- Dropdown menu -->
+          <div v-if="showOwnershipDropdown" class="book-card__dropdown-menu">
+            <button @click="handleToggleOwnership" class="book-card__dropdown-item">
+              {{ book.owned ? 'Mark as Not Owned' : 'Mark as Owned' }}
+            </button>
+          </div>
+
+          <!-- Backdrop to close dropdown when clicking outside -->
+          <div
+            v-if="showOwnershipDropdown"
+            @click="closeOwnershipDropdown"
+            class="book-card__dropdown-backdrop"
+          ></div>
+        </div>
+      </div>
 
       <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
         This book was previously deleted
@@ -346,20 +394,31 @@ const canShowOwnershipToggle = (): boolean => {
   align-items: center;
 }
 
+.book-card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 .book-card__import-button,
 .book-card__delete-button {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  align-self: flex-start;
   padding: 0.5rem 1rem;
-  margin-top: 0.5rem;
   border: none;
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+.book-card__import-button {
+  align-self: flex-start;
+  margin-top: 0.5rem;
 }
 
 .book-card__import-button {
@@ -416,6 +475,101 @@ const canShowOwnershipToggle = (): boolean => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.book-card__ownership-dropdown {
+  position: relative;
+  margin-left: auto;
+}
+
+.book-card__ownership-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.book-card__ownership-button--owned {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-color: #10b981;
+}
+
+.book-card__ownership-button:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.book-card__ownership-button--owned:hover:not(:disabled) {
+  background-color: #a7f3d0;
+}
+
+.book-card__ownership-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.book-card__ownership-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.book-card__dropdown-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.book-card__dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  min-width: 12rem;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+}
+
+.book-card__dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #374151;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.book-card__dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.book-card__dropdown-item:focus {
+  outline: none;
+  background-color: #e5e7eb;
+}
+
+.book-card__dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
 }
 
 .book-card__deleted-message,
