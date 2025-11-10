@@ -14,10 +14,7 @@ import type {
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 class ApiClient {
-  private async request<T>(
-    endpoint: string,
-    options?: RequestInit
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
 
     try {
@@ -87,6 +84,10 @@ class ApiClient {
 
   async getAuthor(id: number): Promise<AuthorResponse> {
     return this.request<AuthorResponse>(`/authors/${id}`);
+  }
+
+  async getAuthorByExternalId(externalId: string): Promise<AuthorResponse> {
+    return this.request<AuthorResponse>(`/authors/by-external-id/${externalId}`);
   }
 
   async updateAuthor(id: number, params: UpdateAuthorRequest): Promise<AuthorResponse> {

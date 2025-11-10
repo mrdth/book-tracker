@@ -56,6 +56,52 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 /**
+ * GET /api/authors/by-external-id/:externalId
+ * Get author by external ID (Hardcover API ID) with all active books
+ * This route must come before GET /api/authors/:id to avoid path conflicts
+ *
+ * Response:
+ * {
+ *   "id": 1,
+ *   "externalId": "123456",
+ *   "name": "Agatha Christie",
+ *   "bio": "...",
+ *   "photoUrl": "...",
+ *   "books": [ ...active books... ],
+ *   "activeBookCount": 66,
+ *   "totalBookCount": 70,
+ *   "createdAt": "...",
+ *   "updatedAt": "..."
+ * }
+ */
+router.get(
+  '/by-external-id/:externalId',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { externalId } = req.params;
+
+      if (!externalId) {
+        throw errors.validationError('externalId is required');
+      }
+
+      logger.info('API request: Get author by external ID', { externalId });
+
+      const author = authorService.getAuthorWithBooksByExternalId(externalId);
+
+      logger.info('API response: Author retrieved by external ID', {
+        authorId: author.id,
+        authorName: author.name,
+        activeBookCount: author.activeBookCount,
+      });
+
+      res.json(author);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+/**
  * GET /api/authors/:id
  * Get author by internal ID with all active books
  *

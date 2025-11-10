@@ -48,8 +48,8 @@ const handleAuthorImport = async (externalId: string) => {
 };
 
 const handleAuthorView = async (externalId: string) => {
-  // Navigate to author page (will be implemented in T071)
-  router.push(`/authors/${externalId}`);
+  // Navigate to author page using external ID
+  router.push(`/authors/external/${externalId}`);
 };
 
 const handleLoadMore = async () => {

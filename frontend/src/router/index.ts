@@ -13,6 +13,12 @@ const router = createRouter({
       component: () => import('../pages/SearchPage.vue'),
     },
     {
+      path: '/authors/external/:externalId',
+      name: 'author-by-external-id',
+      component: () => import('../pages/AuthorPage.vue'),
+      props: true,
+    },
+    {
       path: '/authors/:id',
       name: 'author',
       component: () => import('../pages/AuthorPage.vue'),

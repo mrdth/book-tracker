@@ -25,18 +25,26 @@ const authorId = computed(() => {
   return typeof id === 'string' ? parseInt(id, 10) : null;
 });
 
-const loadAuthor = async () => {
-  if (!authorId.value) {
-    error.value = 'Invalid author ID';
-    loading.value = false;
-    return;
-  }
+const externalId = computed(() => {
+  const id = route.params.externalId;
+  return typeof id === 'string' ? id : null;
+});
 
+const loadAuthor = async () => {
   loading.value = true;
   error.value = null;
 
   try {
-    author.value = await apiClient.getAuthor(authorId.value);
+    // Check if we have an external ID or internal ID
+    if (externalId.value) {
+      author.value = await apiClient.getAuthorByExternalId(externalId.value);
+    } else if (authorId.value) {
+      author.value = await apiClient.getAuthor(authorId.value);
+    } else {
+      error.value = 'Invalid author ID';
+      loading.value = false;
+      return;
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load author';
     console.error('Failed to load author:', err);

@@ -236,6 +236,20 @@ export class AuthorService {
 
   /**
    * Get author by external ID with all active books
+   * Throws error if author not found (for API endpoints)
+   */
+  getAuthorWithBooksByExternalId(externalId: string): AuthorWithBooks {
+    const author = this.authorModel.findByExternalId(externalId);
+    if (!author) {
+      throw errors.notFoundError('Author not found', { externalId });
+    }
+
+    return this.getAuthorWithBooks(author.id);
+  }
+
+  /**
+   * Get author by external ID with all active books
+   * Returns null if author not found (for internal logic)
    */
   getAuthorByExternalId(externalId: string): AuthorWithBooks | null {
     const author = this.authorModel.findByExternalId(externalId);
