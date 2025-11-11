@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { RouterLink } from 'vue-router';
 import type { AuthorListItem } from '@shared/types/author';
 
 interface Props {
@@ -30,7 +31,9 @@ const truncatedName = (name: string): string => {
 </script>
 
 <template>
-  <div class="author-list-card p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow bg-white">
+  <div
+    class="author-list-card p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow bg-white"
+  >
     <!-- Author Photo and Name Row -->
     <div class="flex items-start gap-4">
       <!-- Circular Photo -->
@@ -54,12 +57,15 @@ const truncatedName = (name: string): string => {
 
       <!-- Author Info -->
       <div class="flex-1 min-w-0">
-        <!-- Name with truncation at 50 chars -->
-        <h3
-          class="text-lg font-semibold text-gray-900 mb-1"
-          :title="author.name.length > 50 ? author.name : undefined"
-        >
-          {{ truncatedName(author.name) }}
+        <!-- Name with truncation at 50 chars - clickable link to author page -->
+        <h3 class="mb-1">
+          <RouterLink
+            :to="`/authors/${author.id}`"
+            class="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+            :title="author.name.length > 50 ? author.name : undefined"
+          >
+            {{ truncatedName(author.name) }}
+          </RouterLink>
         </h3>
 
         <!-- Book Count -->
@@ -70,10 +76,7 @@ const truncatedName = (name: string): string => {
         <!-- Bio with 3-line truncation and expand/collapse -->
         <div v-if="author.bio" class="text-sm text-gray-700">
           <p
-            :class="[
-              'bio-text',
-              { 'line-clamp-3': !bioExpanded, 'cursor-pointer': !bioExpanded },
-            ]"
+            :class="['bio-text', { 'line-clamp-3': !bioExpanded, 'cursor-pointer': !bioExpanded }]"
             @click="!bioExpanded && toggleBio()"
           >
             {{ author.bio }}
@@ -97,9 +100,7 @@ const truncatedName = (name: string): string => {
         </div>
 
         <!-- Empty bio message -->
-        <p v-else class="text-sm text-gray-400 italic">
-          No biography available
-        </p>
+        <p v-else class="text-sm text-gray-400 italic">No biography available</p>
       </div>
     </div>
   </div>
