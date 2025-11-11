@@ -3,7 +3,7 @@ import { onMounted } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { useAuthorsList } from '../composables/useAuthorsList';
-import AuthorCard from '../components/authors/AuthorCard.vue';
+import AuthorListCard from '../components/authors/AuthorListCard.vue';
 
 // Initialize the authors list composable
 const { authors, loading, error, hasMore, loadMore, reset } = useAuthorsList();
@@ -64,12 +64,7 @@ onMounted(() => {
         class="flex flex-col items-center justify-center py-16"
       >
         <div class="text-red-600 mb-4">
-          <svg
-            class="w-16 h-16 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -94,12 +89,7 @@ onMounted(() => {
         class="flex flex-col items-center justify-center py-16"
       >
         <div class="text-gray-400 mb-4">
-          <svg
-            class="w-16 h-16 mx-auto"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -129,16 +119,13 @@ onMounted(() => {
               :data-index="index"
               class="scroller-item"
             >
-              <AuthorCard :author="item" />
+              <AuthorListCard :author="item" />
             </DynamicScrollerItem>
           </template>
         </DynamicScroller>
 
         <!-- Pagination Loading Indicator -->
-        <div
-          v-if="loading && authors.length > 0"
-          class="flex items-center justify-center py-8"
-        >
+        <div v-if="loading && authors.length > 0" class="flex items-center justify-center py-8">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
           <p class="text-gray-600">Loading more authors...</p>
         </div>
@@ -148,12 +135,7 @@ onMounted(() => {
           v-if="!hasMore && authors.length > 0 && !loading"
           class="flex items-center justify-center py-8 text-gray-500"
         >
-          <svg
-            class="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -165,10 +147,7 @@ onMounted(() => {
         </div>
 
         <!-- Pagination Error (if error occurs during pagination) -->
-        <div
-          v-if="error && authors.length > 0"
-          class="flex flex-col items-center py-8"
-        >
+        <div v-if="error && authors.length > 0" class="flex flex-col items-center py-8">
           <p class="text-red-600 mb-3">Failed to load more authors: {{ error.message }}</p>
           <button
             @click="loadMore"
