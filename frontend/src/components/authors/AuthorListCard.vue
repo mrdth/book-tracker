@@ -70,7 +70,10 @@ const truncatedName = (name: string): string => {
 
         <!-- Book Count -->
         <p class="text-sm text-gray-600 mb-2">
-          {{ author.bookCount }} {{ author.bookCount === 1 ? 'book' : 'books' }} collected
+          {{ author.bookCount }} {{ author.bookCount === 1 ? 'book' : 'books' }} ({{
+            author.ownedBookCount
+          }}
+          owned)
         </p>
 
         <!-- Bio with 3-line truncation and expand/collapse -->

@@ -101,7 +101,12 @@ router.post('/list', async (req: Request, res: Response, next: NextFunction) => 
          FROM book_authors ba
          JOIN books b ON ba.book_id = b.id
          WHERE ba.author_id = a.id AND b.deleted = 0
-        ) as bookCount
+        ) as bookCount,
+        (SELECT COUNT(*)
+         FROM book_authors ba
+         JOIN books b ON ba.book_id = b.id
+         WHERE ba.author_id = a.id AND b.deleted = 0 AND b.owned = 1
+        ) as ownedBookCount
       FROM authors a
       WHERE 1=1
     `;

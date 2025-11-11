@@ -28,6 +28,7 @@ export interface AuthorListItem {
   bio: string | null;
   photoUrl: string | null;
   bookCount: number;
+  ownedBookCount: number;
   createdAt: string;
   updatedAt: string;
 }
