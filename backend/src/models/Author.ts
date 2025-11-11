@@ -1,10 +1,12 @@
 import type Database from 'better-sqlite3';
 import { getDatabase } from '../db/connection.js';
+import { generateSortName } from '../utils/nameParser.js';
 
 export interface Author {
   id: number;
   externalId: string;
   name: string;
+  sortName: string | null;
   bio: string | null;
   photoUrl: string | null;
   createdAt: string;
@@ -35,14 +37,17 @@ export class AuthorModel {
    * Create a new author
    */
   create(input: CreateAuthorInput): Author {
+    const sortName = generateSortName(input.name);
+
     const stmt = this.db.prepare(`
-      INSERT INTO authors (external_id, name, bio, photo_url)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO authors (external_id, name, sort_name, bio, photo_url)
+      VALUES (?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
       input.externalId,
       input.name,
+      sortName,
       input.bio ?? null,
       input.photoUrl ?? null
     );
@@ -64,6 +69,7 @@ export class AuthorModel {
         id,
         external_id as externalId,
         name,
+        sort_name as sortName,
         bio,
         photo_url as photoUrl,
         created_at as createdAt,
@@ -72,7 +78,7 @@ export class AuthorModel {
       WHERE id = ?
     `);
 
-    return stmt.get(id) as Author | undefined || null;
+    return (stmt.get(id) as Author | undefined) || null;
   }
 
   /**
@@ -84,6 +90,7 @@ export class AuthorModel {
         id,
         external_id as externalId,
         name,
+        sort_name as sortName,
         bio,
         photo_url as photoUrl,
         created_at as createdAt,
@@ -92,7 +99,7 @@ export class AuthorModel {
       WHERE external_id = ?
     `);
 
-    return stmt.get(externalId) as Author | undefined || null;
+    return (stmt.get(externalId) as Author | undefined) || null;
   }
 
   /**
@@ -104,6 +111,7 @@ export class AuthorModel {
         id,
         external_id as externalId,
         name,
+        sort_name as sortName,
         bio,
         photo_url as photoUrl,
         created_at as createdAt,
@@ -112,7 +120,7 @@ export class AuthorModel {
       WHERE LOWER(name) = LOWER(?)
     `);
 
-    return stmt.get(name) as Author | undefined || null;
+    return (stmt.get(name) as Author | undefined) || null;
   }
 
   /**
@@ -125,6 +133,9 @@ export class AuthorModel {
     if (input.name !== undefined) {
       updates.push('name = ?');
       values.push(input.name);
+      // Regenerate sort_name when name changes
+      updates.push('sort_name = ?');
+      values.push(generateSortName(input.name));
     }
 
     if (input.bio !== undefined) {
@@ -172,12 +183,13 @@ export class AuthorModel {
         id,
         external_id as externalId,
         name,
+        sort_name as sortName,
         bio,
         photo_url as photoUrl,
         created_at as createdAt,
         updated_at as updatedAt
       FROM authors
-      ORDER BY name ASC
+      ORDER BY sort_name COLLATE NOCASE ASC
       LIMIT ? OFFSET ?
     `);
 

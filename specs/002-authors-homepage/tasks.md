@@ -40,10 +40,10 @@ This is a monorepo with:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T006 Update `backend/src/models/Author.ts` to include sortName field in Author interface
-- [ ] T007 Update `backend/src/models/Author.ts` create method to generate and store sort_name on author creation
-- [ ] T008 Update `backend/src/models/Author.ts` update method to regenerate sort_name when name changes
-- [ ] T009 Update `backend/src/models/Author.ts` findAll method to sort by sort_name COLLATE NOCASE
+- [X] T006 Update `backend/src/models/Author.ts` to include sortName field in Author interface
+- [X] T007 Update `backend/src/models/Author.ts` create method to generate and store sort_name on author creation
+- [X] T008 Update `backend/src/models/Author.ts` update method to regenerate sort_name when name changes
+- [X] T009 Update `backend/src/models/Author.ts` findAll method to sort by sort_name COLLATE NOCASE
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
