@@ -2,9 +2,145 @@ import { Router, type Request, type Response, type NextFunction } from 'express'
 import { AuthorService } from '../../services/AuthorService.js';
 import { logger } from '../../config/logger.js';
 import { errors } from '../middleware/errorHandler.js';
+import { getDatabase } from '../../db/connection.js';
 
 const router = Router();
 const authorService = new AuthorService();
+
+/**
+ * POST /api/authors/list
+ * Get paginated authors list with cursor-based pagination
+ *
+ * Request body:
+ * {
+ *   "cursor": { "name": "Christie, Agatha", "id": 123 } | null,
+ *   "letterFilter": "M" | null,
+ *   "limit": 50
+ * }
+ *
+ * Response:
+ * {
+ *   "authors": [
+ *     {
+ *       "id": 1,
+ *       "externalId": "12345",
+ *       "name": "Agatha Christie",
+ *       "bio": "...",
+ *       "photoUrl": "...",
+ *       "bookCount": 66,
+ *       "createdAt": "...",
+ *       "updatedAt": "..."
+ *     }
+ *   ],
+ *   "hasMore": true
+ * }
+ */
+router.post('/list', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const db = getDatabase();
+
+    // Extract and validate parameters
+    let { cursor, letterFilter, limit = 50 } = req.body;
+
+    // Validate cursor
+    if (cursor !== undefined && cursor !== null) {
+      if (typeof cursor !== 'object' || !cursor.name || !cursor.id) {
+        throw errors.validationError('cursor must include both name and id properties');
+      }
+      if (typeof cursor.name !== 'string' || cursor.name.trim().length === 0) {
+        throw errors.validationError('cursor.name must be a non-empty string');
+      }
+      if (typeof cursor.id !== 'number' || cursor.id <= 0 || !Number.isInteger(cursor.id)) {
+        throw errors.validationError('cursor.id must be a positive integer');
+      }
+    }
+
+    // Validate and normalize letterFilter
+    if (letterFilter !== undefined && letterFilter !== null) {
+      if (typeof letterFilter !== 'string' || letterFilter.length !== 1) {
+        throw errors.validationError('letterFilter must be a single letter A-Z');
+      }
+      letterFilter = letterFilter.toUpperCase();
+      if (!/^[A-Z]$/.test(letterFilter)) {
+        throw errors.validationError('letterFilter must be a single letter A-Z');
+      }
+    }
+
+    // Validate and normalize limit
+    if (limit !== undefined) {
+      if (typeof limit !== 'number') {
+        throw errors.validationError('limit must be a number');
+      }
+      limit = Math.floor(limit);
+      if (limit < 1) {
+        limit = 50;
+      }
+      if (limit > 100) {
+        limit = 100;
+      }
+    }
+
+    logger.info('API request: Authors list', {
+      cursor: cursor || null,
+      letterFilter: letterFilter || null,
+      limit,
+    });
+
+    // Build SQL query with cursor-based pagination
+    let query = `
+      SELECT
+        a.id,
+        a.external_id as externalId,
+        a.name,
+        a.sort_name as sortName,
+        a.bio,
+        a.photo_url as photoUrl,
+        a.created_at as createdAt,
+        a.updated_at as updatedAt,
+        (SELECT COUNT(*)
+         FROM book_authors ba
+         JOIN books b ON ba.book_id = b.id
+         WHERE ba.author_id = a.id AND b.deleted = 0
+        ) as bookCount
+      FROM authors a
+      WHERE 1=1
+    `;
+
+    const params: any[] = [];
+
+    // Add letter filter
+    if (letterFilter) {
+      query += ` AND a.sort_name LIKE ?`;
+      params.push(`${letterFilter}%`);
+    }
+
+    // Add cursor for pagination (row value comparison)
+    if (cursor) {
+      query += ` AND (a.sort_name, a.id) > (?, ?)`;
+      params.push(cursor.name, cursor.id);
+    }
+
+    query += ` ORDER BY a.sort_name COLLATE NOCASE ASC, a.id ASC LIMIT ?`;
+    params.push(limit);
+
+    const stmt = db.prepare(query);
+    const authors = stmt.all(...params);
+
+    // Determine if there are more results
+    const hasMore = authors.length === limit;
+
+    logger.info('API response: Authors list retrieved', {
+      count: authors.length,
+      hasMore,
+      letterFilter: letterFilter || null,
+      hasCursor: !!cursor,
+    });
+
+    res.json({ authors, hasMore });
+  } catch (error) {
+    next(error);
+  }
+});
 
 /**
  * POST /api/authors

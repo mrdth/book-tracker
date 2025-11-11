@@ -57,29 +57,29 @@ This is a monorepo with:
 
 ### Backend Implementation for User Story 1
 
-- [ ] T010 [US1] Create POST /api/authors/list endpoint in `backend/src/api/routes/authors.ts` with cursor-based pagination
-- [ ] T011 [US1] Add request validation for cursor, letterFilter, and limit parameters in `backend/src/api/routes/authors.ts`
-- [ ] T012 [US1] Implement SQL query with cursor-based pagination using row value comparisons in `backend/src/api/routes/authors.ts`
-- [ ] T013 [US1] Add book count subquery to authors list endpoint in `backend/src/api/routes/authors.ts`
-- [ ] T014 [US1] Add logging for API requests and responses in `backend/src/api/routes/authors.ts`
+- [X] T010 [US1] Create POST /api/authors/list endpoint in `backend/src/api/routes/authors.ts` with cursor-based pagination
+- [X] T011 [US1] Add request validation for cursor, letterFilter, and limit parameters in `backend/src/api/routes/authors.ts`
+- [X] T012 [US1] Implement SQL query with cursor-based pagination using row value comparisons in `backend/src/api/routes/authors.ts`
+- [X] T013 [US1] Add book count subquery to authors list endpoint in `backend/src/api/routes/authors.ts`
+- [X] T014 [US1] Add logging for API requests and responses in `backend/src/api/routes/authors.ts`
 
 ### Frontend Implementation for User Story 1
 
-- [ ] T015 [P] [US1] Create TypeScript interfaces for Author and pagination types in `shared/src/types/author.ts`
-- [ ] T016 [P] [US1] Create useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts` with pagination state management
-- [ ] T017 [P] [US1] Create AuthorCard component in `frontend/src/components/authors/AuthorCard.vue` with photo, name, bio, and book count display
-- [ ] T018 [US1] Implement bio truncation to 3 lines using CSS line-clamp with ellipsis in `frontend/src/components/authors/AuthorCard.vue`
-- [ ] T018a [US1] Add click handler to expand bio in-place to show full text in `frontend/src/components/authors/AuthorCard.vue`
-- [ ] T018b [US1] Implement name truncation at 50 characters with ellipsis and full name in HTML title tooltip in `frontend/src/components/authors/AuthorCard.vue`
-- [ ] T019 [US1] Add circular photo styling and placeholder for missing photos in `frontend/src/components/authors/AuthorCard.vue`
-- [ ] T020 [US1] Display "No biography available" message for empty bios in `frontend/src/components/authors/AuthorCard.vue`
-- [ ] T021 [US1] Create AuthorsHomePage component in `frontend/src/pages/AuthorsHomePage.vue` with virtual scrolling setup
-- [ ] T022 [US1] Integrate DynamicScroller from vue-virtual-scroller in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T023 [US1] Implement scroll event handler to trigger loadMore in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T024 [US1] Add loading indicator for initial page load in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T025 [US1] Add error state display with retry button in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T026 [US1] Add empty state message for no authors in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T027 [US1] Update router configuration in `frontend/src/router/index.ts` to add authors homepage route at "/"
+- [X] T015 [P] [US1] Create TypeScript interfaces for Author and pagination types in `shared/src/types/author.ts`
+- [X] T016 [P] [US1] Create useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts` with pagination state management
+- [X] T017 [P] [US1] Create AuthorCard component in `frontend/src/components/authors/AuthorCard.vue` with photo, name, bio, and book count display
+- [X] T018 [US1] Implement bio truncation to 3 lines using CSS line-clamp with ellipsis in `frontend/src/components/authors/AuthorCard.vue`
+- [X] T018a [US1] Add click handler to expand bio in-place to show full text in `frontend/src/components/authors/AuthorCard.vue`
+- [X] T018b [US1] Implement name truncation at 50 characters with ellipsis and full name in HTML title tooltip in `frontend/src/components/authors/AuthorCard.vue`
+- [X] T019 [US1] Add circular photo styling and placeholder for missing photos in `frontend/src/components/authors/AuthorCard.vue`
+- [X] T020 [US1] Display "No biography available" message for empty bios in `frontend/src/components/authors/AuthorCard.vue`
+- [X] T021 [US1] Create AuthorsHomePage component in `frontend/src/pages/AuthorsHomePage.vue` with virtual scrolling setup
+- [X] T022 [US1] Integrate DynamicScroller from vue-virtual-scroller in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T023 [US1] Implement scroll event handler to trigger loadMore in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T024 [US1] Add loading indicator for initial page load in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T025 [US1] Add error state display with retry button in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T026 [US1] Add empty state message for no authors in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T027 [US1] Update router configuration in `frontend/src/router/index.ts` to add authors homepage route at "/"
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can browse paginated authors list sorted by last name
 
