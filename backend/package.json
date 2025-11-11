@@ -14,6 +14,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "type-check": "tsc --noEmit",
     "db:migrate": "node --loader ts-node/esm src/db/migrate.ts",
+    "db:backfill-sort-names": "node --loader ts-node/esm src/db/backfillSortNames.ts",
     "db:schema": "sqlite3 data/books.db '.schema'",
     "db:reset": "rm -f data/books.db && npm run db:migrate"
   },

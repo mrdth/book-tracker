@@ -26,11 +26,11 @@ This is a monorepo with:
 
 **Purpose**: Project initialization and database schema updates
 
-- [ ] T001 Create migration file `backend/src/db/migrations/003_add_author_sort_name.sql` to add sort_name column and index
-- [ ] T002 [P] Create name parser utility `backend/src/utils/nameParser.ts` with generateSortName function
-- [ ] T003 Create backfill script `backend/src/db/backfillSortNames.ts` to populate sort_name for existing authors
-- [ ] T004 Run migration and backfill script to update database schema
-- [ ] T005 [P] Install frontend dependencies: @vueuse/core and vue-virtual-scroller@next
+- [X] T001 Create migration file `backend/src/db/migrations/003_add_author_sort_name.sql` to add sort_name column and index
+- [X] T002 [P] Create name parser utility `backend/src/utils/nameParser.ts` with generateSortName function
+- [X] T003 Create backfill script `backend/src/db/backfillSortNames.ts` to populate sort_name for existing authors
+- [X] T004 Run migration and backfill script to update database schema
+- [X] T005 [P] Install frontend dependencies: @vueuse/core and vue-virtual-scroller@next
 
 ---
 
