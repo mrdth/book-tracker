@@ -112,19 +112,19 @@ This is a monorepo with:
 
 ### Backend Implementation for User Story 3
 
-- [ ] T034 [US3] Add letterFilter support to SQL query in `backend/src/api/routes/authors.ts` using LIKE clause
-- [ ] T035 [US3] Add letterFilter validation (single A-Z character) in `backend/src/api/routes/authors.ts`
+- [X] T034 [US3] Add letterFilter support to SQL query in `backend/src/api/routes/authors.ts` using LIKE clause
+- [X] T035 [US3] Add letterFilter validation (single A-Z character) in `backend/src/api/routes/authors.ts`
 
 ### Frontend Implementation for User Story 3
 
-- [ ] T036 [P] [US3] Create AlphabetFilter component in `frontend/src/components/authors/AlphabetFilter.vue` with A-Z buttons
-- [ ] T037 [US3] Add "All" button to clear filter in `frontend/src/components/authors/AlphabetFilter.vue`
-- [ ] T038 [US3] Implement visual highlighting for selected letter in `frontend/src/components/authors/AlphabetFilter.vue`
-- [ ] T039 [US3] Add letterFilter state to AuthorsHomePage in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T040 [US3] Integrate AlphabetFilter component in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T041 [US3] Implement filter reset logic in useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts`
-- [ ] T042 [US3] Add watcher to reset pagination when letterFilter changes in `frontend/src/composables/useAuthorsList.ts`
-- [ ] T043 [US3] Update empty state message to show "No authors found for letter X" in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T036 [P] [US3] Create AlphabetFilter component in `frontend/src/components/authors/AlphabetFilter.vue` with A-Z buttons
+- [X] T037 [US3] Add "All" button to clear filter in `frontend/src/components/authors/AlphabetFilter.vue`
+- [X] T038 [US3] Implement visual highlighting for selected letter in `frontend/src/components/authors/AlphabetFilter.vue`
+- [X] T039 [US3] Add letterFilter state to AuthorsHomePage in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T040 [US3] Integrate AlphabetFilter component in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T041 [US3] Implement filter reset logic in useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts`
+- [X] T042 [US3] Add watcher to reset pagination when letterFilter changes in `frontend/src/composables/useAuthorsList.ts`
+- [X] T043 [US3] Update empty state message to show "No authors found for letter X" in `frontend/src/pages/AuthorsHomePage.vue`
 
 **Checkpoint**: All primary user stories complete - browsing, pagination, and filtering all functional
 

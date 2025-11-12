@@ -38,6 +38,7 @@ export interface Pagination {
   perPage: number;
   totalResults: number;
   totalPages: number;
+  hasMore: boolean;
 }
 
 export interface SearchResponse {

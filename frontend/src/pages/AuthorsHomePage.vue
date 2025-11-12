@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import { useAuthorsList } from '../composables/useAuthorsList';
 import AuthorListCard from '../components/authors/AuthorListCard.vue';
+import AlphabetFilter from '../components/authors/AlphabetFilter.vue';
 
-// Initialize the authors list composable
-const { authors, loading, error, hasMore, loadMore, reset } = useAuthorsList();
+// Letter filter state
+const letterFilter = ref<string | null>(null);
+
+// Initialize the authors list composable with letter filter
+const { authors, loading, error, hasMore, loadMore, reset } = useAuthorsList(letterFilter);
+
+/**
+ * Handle letter filter selection
+ * The composable will automatically reset and reload when letterFilter changes
+ */
+const handleLetterSelect = (letter: string | null) => {
+  letterFilter.value = letter;
+};
 
 /**
  * Handle scroll event to trigger infinite loading
@@ -49,6 +61,11 @@ onMounted(() => {
     </div>
 
     <div class="max-w-7xl mx-auto px-4">
+      <!-- Alphabet Filter -->
+      <div class="mb-6">
+        <AlphabetFilter :selected-letter="letterFilter" @select="handleLetterSelect" />
+      </div>
+
       <!-- Initial Loading State -->
       <div
         v-if="loading && authors.length === 0"
@@ -98,8 +115,20 @@ onMounted(() => {
             />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">No authors found</h2>
-        <p class="text-gray-600">Start by importing some authors to your collection.</p>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">
+          {{ letterFilter ? `No authors found for letter ${letterFilter}` : 'No authors found' }}
+        </h2>
+        <p v-if="letterFilter" class="text-gray-600 mb-4">
+          Try selecting a different letter or clear the filter to see all authors.
+        </p>
+        <p v-else class="text-gray-600">Start by importing some authors to your collection.</p>
+        <button
+          v-if="letterFilter"
+          @click="handleLetterSelect(null)"
+          class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Clear Filter
+        </button>
       </div>
 
       <!-- Authors List with Virtual Scrolling -->
