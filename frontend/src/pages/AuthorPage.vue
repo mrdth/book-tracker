@@ -20,6 +20,7 @@ const isBulkMode = ref(false);
 const selectedBookIds = ref<Set<number>>(new Set());
 const isBulkUpdating = ref(false);
 const bookFilter = ref<'all' | 'owned' | 'not_owned'>('all');
+const showFilterDropdown = ref(false);
 
 const authorId = computed(() => {
   const id = route.params.id;
@@ -277,6 +278,31 @@ const handleOwnershipUpdate = async (bookId: number, owned: boolean) => {
   }
 };
 
+const toggleFilterDropdown = () => {
+  showFilterDropdown.value = !showFilterDropdown.value;
+};
+
+const closeFilterDropdown = () => {
+  showFilterDropdown.value = false;
+};
+
+const setFilter = (filter: 'all' | 'owned' | 'not_owned') => {
+  bookFilter.value = filter;
+  closeFilterDropdown();
+};
+
+const getFilterLabel = (): string => {
+  switch (bookFilter.value) {
+    case 'owned':
+      return `Owned (${ownedBooksCount.value})`;
+    case 'not_owned':
+      return `Not Owned (${notOwnedBooksCount.value})`;
+    case 'all':
+    default:
+      return `All Books (${author.value?.books.length || 0})`;
+  }
+};
+
 onMounted(() => {
   loadAuthor();
 });
@@ -475,50 +501,107 @@ onMounted(() => {
         <section class="author-page__books">
           <div class="author-page__books-header">
             <h2 class="author-page__books-title">Books</h2>
-            <button
-              v-if="author.books.length > 0 && !isBulkMode"
-              class="action-button action-button--secondary"
-              title="Enable bulk actions"
-              @click="toggleBulkMode"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="action-icon"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
-                />
-              </svg>
-              <span>Bulk Actions</span>
-            </button>
-          </div>
+            <div v-if="author.books.length > 0 && !isBulkMode" class="author-page__header-actions">
+              <!-- Filter Dropdown -->
+              <div class="filter-dropdown">
+                <button
+                  class="action-button action-button--secondary"
+                  title="Filter books"
+                  @click="toggleFilterDropdown"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="action-icon"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+                    />
+                  </svg>
+                  <span>{{ getFilterLabel() }}</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="dropdown-chevron"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
+                </button>
 
-          <!-- Filter Buttons -->
-          <div v-if="author.books.length > 0" class="author-page__filter-bar">
-            <button
-              :class="['filter-button', { 'filter-button--active': bookFilter === 'all' }]"
-              @click="bookFilter = 'all'"
-            >
-              All ({{ author.books.length }})
-            </button>
-            <button
-              :class="['filter-button', { 'filter-button--active': bookFilter === 'owned' }]"
-              @click="bookFilter = 'owned'"
-            >
-              Owned ({{ ownedBooksCount }})
-            </button>
-            <button
-              :class="['filter-button', { 'filter-button--active': bookFilter === 'not_owned' }]"
-              @click="bookFilter = 'not_owned'"
-            >
-              Not Owned ({{ notOwnedBooksCount }})
-            </button>
+                <!-- Dropdown menu -->
+                <div v-if="showFilterDropdown" class="filter-dropdown__menu">
+                  <button
+                    :class="[
+                      'filter-dropdown__item',
+                      { 'filter-dropdown__item--active': bookFilter === 'all' },
+                    ]"
+                    @click="setFilter('all')"
+                  >
+                    All Books ({{ author.books.length }})
+                  </button>
+                  <button
+                    :class="[
+                      'filter-dropdown__item',
+                      { 'filter-dropdown__item--active': bookFilter === 'owned' },
+                    ]"
+                    @click="setFilter('owned')"
+                  >
+                    Owned ({{ ownedBooksCount }})
+                  </button>
+                  <button
+                    :class="[
+                      'filter-dropdown__item',
+                      { 'filter-dropdown__item--active': bookFilter === 'not_owned' },
+                    ]"
+                    @click="setFilter('not_owned')"
+                  >
+                    Not Owned ({{ notOwnedBooksCount }})
+                  </button>
+                </div>
+
+                <!-- Backdrop to close dropdown -->
+                <div
+                  v-if="showFilterDropdown"
+                  class="filter-dropdown__backdrop"
+                  @click="closeFilterDropdown"
+                />
+              </div>
+
+              <!-- Bulk Actions Button -->
+              <button
+                class="action-button action-button--secondary"
+                title="Enable bulk actions"
+                @click="toggleBulkMode"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="action-icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+                  />
+                </svg>
+                <span>Bulk Actions</span>
+              </button>
+            </div>
           </div>
 
           <BulkActionBar
@@ -892,46 +975,71 @@ onMounted(() => {
   margin: 0;
 }
 
-.author-page__filter-bar {
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid #e5e7eb;
-  margin-bottom: 1rem;
+.filter-dropdown {
+  position: relative;
 }
 
-.filter-button {
-  padding: 0.5rem 1rem;
+.dropdown-chevron {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.25rem;
+}
+
+.filter-dropdown__menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  min-width: 12rem;
   background-color: white;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.filter-dropdown__item {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  text-align: left;
   font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.filter-button:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
   color: #374151;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.filter-button--active {
-  background-color: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+.filter-dropdown__item:hover {
+  background-color: #f3f4f6;
 }
 
-.filter-button--active:hover {
-  background-color: #2563eb;
-  border-color: #2563eb;
+.filter-dropdown__item--active {
+  background-color: #eff6ff;
+  color: #3b82f6;
+  font-weight: 500;
 }
 
-.filter-button:focus {
+.filter-dropdown__item--active:hover {
+  background-color: #dbeafe;
+}
+
+.filter-dropdown__item:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  background-color: #e5e7eb;
+}
+
+.filter-dropdown__backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
 }
 
 .author-page__no-books {
