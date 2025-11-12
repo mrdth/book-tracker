@@ -5,10 +5,7 @@ const route = useRoute();
 </script>
 
 <template>
-  <div
-    id="app"
-    class="min-h-screen flex flex-col bg-gray-50"
-  >
+  <div id="app" class="min-h-screen flex flex-col bg-gray-50">
     <!-- Persistent Navigation Bar -->
     <nav
       class="bg-white shadow-md border-b border-gray-200 sticky top-0 z-50"
@@ -19,9 +16,7 @@ const route = useRoute();
         <div class="flex h-16 items-center justify-between">
           <!-- Brand/Logo Area -->
           <div class="flex items-center">
-            <h1 class="text-xl font-bold text-gray-900">
-              Book Tracker
-            </h1>
+            <h1 class="text-xl font-bold text-gray-900">Book Tracker</h1>
           </div>
 
           <!-- Navigation Links -->
@@ -51,6 +46,19 @@ const route = useRoute();
               :aria-current="route.path === '/search' ? 'page' : undefined"
             >
               Search
+            </RouterLink>
+            <RouterLink
+              to="/scan"
+              :class="[
+                'px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2',
+                route.path === '/scan'
+                  ? 'text-blue-600 bg-blue-50 border-b-2 border-blue-600'
+                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50',
+              ]"
+              :aria-current="route.path === '/scan' ? 'page' : undefined"
+            >
+              Scan
             </RouterLink>
           </div>
         </div>

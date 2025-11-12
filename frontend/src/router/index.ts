@@ -14,6 +14,11 @@ const router = createRouter({
       component: () => import('../pages/SearchPage.vue'),
     },
     {
+      path: '/scan',
+      name: 'ownership-scan',
+      component: () => import('../pages/OwnershipScanPage.vue'),
+    },
+    {
       path: '/authors/external/:externalId',
       name: 'author-by-external-id',
       component: () => import('../pages/AuthorPage.vue'),
