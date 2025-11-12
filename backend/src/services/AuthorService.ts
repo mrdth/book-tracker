@@ -8,13 +8,16 @@ import { ownershipScanner } from './OwnershipScanner.js';
 import { logger } from '../config/logger.js';
 import { errors } from '../api/middleware/errorHandler.js';
 import {
-  GET_AUTHOR_WITH_BOOKS,
+  GET_AUTHOR_BY_ID,
+  GET_BOOKS_FOR_AUTHOR,
   // SEARCH_BOOKS_BY_AUTHOR_NAME, // Reserved for future use
 } from '../../../shared/dist/queries/hardcover.js';
 import type {
-  GetAuthorResponse,
-  HardcoverAuthorWithBooks,
+  GetAuthorByIdResponse,
+  GetBooksForAuthorResponse,
+  HardcoverAuthor,
   HardcoverBook,
+  HardcoverImage,
 } from '../../../shared/dist/queries/hardcover.js';
 import type { AuthorWithBooks } from '../../../shared/dist/types/author.js';
 import type { Book } from '../../../shared/dist/types/book.js';
@@ -40,8 +43,61 @@ export class AuthorService {
   }
 
   /**
+   * Fetch all books for an author from Hardcover API in batches
+   * Handles pagination to overcome the 100 contribution limit
+   */
+  private async fetchAllBooksForAuthor(authorId: number): Promise<HardcoverBook[]> {
+    const allBooks: HardcoverBook[] = [];
+    let offset = 0;
+    const batchSize = 25;
+    let hasMore = true;
+
+    logger.info('Starting batch fetch of books for author', { authorId });
+
+    while (hasMore) {
+      try {
+        const response = await hardcoverClient.request<GetBooksForAuthorResponse>(
+          GET_BOOKS_FOR_AUTHOR,
+          {
+            id: authorId,
+            offset,
+          }
+        );
+
+        const books = response.books || [];
+        allBooks.push(...books);
+
+        logger.debug('Fetched book batch', {
+          authorId,
+          offset,
+          batchSize: books.length,
+          totalFetched: allBooks.length,
+        });
+
+        // If we got fewer books than the batch size, we've reached the end
+        if (books.length < batchSize) {
+          hasMore = false;
+        } else {
+          offset += batchSize;
+        }
+      } catch (error) {
+        logger.error('Failed to fetch book batch', error, { authorId, offset });
+        throw error;
+      }
+    }
+
+    logger.info('Completed batch fetch of books for author', {
+      authorId,
+      totalBooks: allBooks.length,
+    });
+
+    return allBooks;
+  }
+
+  /**
    * Import author with all their books from Hardcover API
    * Performs bulk ownership scanning for all imported books
+   * Uses batch fetching to overcome the 100 contribution limit
    */
   async importAuthor(externalId: string): Promise<AuthorImportResult> {
     logger.info('Starting author import', { externalId });
@@ -63,29 +119,34 @@ export class AuthorService {
       };
     }
 
-    // Fetch author with books from Hardcover API
-    let hardcoverAuthor: HardcoverAuthorWithBooks;
+    // Fetch author and books from Hardcover API using batch approach
+    let hardcoverAuthor: HardcoverAuthor & { books_count?: number };
     let hardcoverBooks: HardcoverBook[] = [];
 
     try {
-      // Get author info
-      const response = await hardcoverClient.request<GetAuthorResponse>(GET_AUTHOR_WITH_BOOKS, {
-        id: parseInt(externalId, 10),
-      });
-      hardcoverAuthor = response.authors_by_pk;
+      // Get author info (without books to avoid 100 contribution limit)
+      const authorResponse = await hardcoverClient.request<GetAuthorByIdResponse>(
+        GET_AUTHOR_BY_ID,
+        {
+          id: parseInt(externalId, 10),
+        }
+      );
+      hardcoverAuthor = authorResponse.authors_by_pk;
 
       if (!hardcoverAuthor) {
         throw errors.notFoundError('Author not found in Hardcover API', { externalId });
       }
 
-      // Extract books from contributions
-      if (hardcoverAuthor.contributions && hardcoverAuthor.contributions.length > 0) {
-        hardcoverBooks = hardcoverAuthor.contributions
-          .filter((contribution) => contribution.book)
-          .map((contribution) => contribution.book!);
-      }
+      logger.info('Author info fetched from Hardcover API', {
+        externalId,
+        name: hardcoverAuthor.name,
+        booksCount: hardcoverAuthor.books_count,
+      });
 
-      logger.info('Author fetched from Hardcover API', {
+      // Fetch all books in batches
+      hardcoverBooks = await this.fetchAllBooksForAuthor(parseInt(externalId, 10));
+
+      logger.info('All books fetched from Hardcover API', {
         externalId,
         name: hardcoverAuthor.name,
         bookCount: hardcoverBooks.length,
@@ -106,7 +167,7 @@ export class AuthorService {
         externalId: String(hardcoverAuthor.id),
         name: hardcoverAuthor.name,
         bio: hardcoverAuthor.bio ?? null,
-        photoUrl: hardcoverAuthor.image?.url ?? null,
+        photoUrl: this.extractImageUrl(hardcoverAuthor.image),
       });
 
       logger.info('Author created', {
@@ -157,7 +218,7 @@ export class AuthorService {
           isbn: isbn,
           description: hardcoverBook.description ?? null,
           publicationDate: this.transformReleaseYear(hardcoverBook.release_year),
-          coverUrl: hardcoverBook.image?.url ?? null,
+          coverUrl: this.extractImageUrl(hardcoverBook.image),
           owned: owned,
           ownedSource: owned ? 'filesystem' : 'none',
         });
@@ -291,6 +352,7 @@ export class AuthorService {
   /**
    * Refresh author's books from Hardcover API
    * Imports new books, skips already imported and deleted books
+   * Uses batch fetching to overcome the 100 contribution limit
    */
   async refreshAuthorBooks(authorId: number): Promise<AuthorImportResult> {
     logger.info('Refreshing author books from API', { authorId });
@@ -300,16 +362,19 @@ export class AuthorService {
       throw errors.notFoundError('Author not found', { authorId });
     }
 
-    // Fetch latest books from Hardcover API
+    // Fetch latest books from Hardcover API using batch approach
     let hardcoverBooks: HardcoverBook[] = [];
 
     try {
       // Verify author still exists in API
-      const response = await hardcoverClient.request<GetAuthorResponse>(GET_AUTHOR_WITH_BOOKS, {
-        id: parseInt(author.externalId, 10),
-      });
+      const authorResponse = await hardcoverClient.request<GetAuthorByIdResponse>(
+        GET_AUTHOR_BY_ID,
+        {
+          id: parseInt(author.externalId, 10),
+        }
+      );
 
-      const hardcoverAuthor = response.authors_by_pk;
+      const hardcoverAuthor = authorResponse.authors_by_pk;
 
       if (!hardcoverAuthor) {
         throw errors.notFoundError('Author not found in Hardcover API', {
@@ -317,12 +382,14 @@ export class AuthorService {
         });
       }
 
-      // Extract books from contributions
-      if (hardcoverAuthor.contributions && hardcoverAuthor.contributions.length > 0) {
-        hardcoverBooks = hardcoverAuthor.contributions
-          .filter((contribution) => contribution.book)
-          .map((contribution) => contribution.book!);
-      }
+      logger.info('Author info verified in Hardcover API', {
+        authorId,
+        authorName: author.name,
+        booksCount: hardcoverAuthor.books_count,
+      });
+
+      // Fetch all books in batches
+      hardcoverBooks = await this.fetchAllBooksForAuthor(parseInt(author.externalId, 10));
 
       logger.info('Latest books fetched from Hardcover API', {
         authorId,
@@ -373,7 +440,7 @@ export class AuthorService {
           isbn: isbn,
           description: hardcoverBook.description ?? null,
           publicationDate: this.transformReleaseYear(hardcoverBook.release_year),
-          coverUrl: hardcoverBook.image?.url ?? null,
+          coverUrl: this.extractImageUrl(hardcoverBook.image),
           owned: owned,
           ownedSource: owned ? 'filesystem' : 'none',
         });
@@ -447,6 +514,16 @@ export class AuthorService {
     }
 
     return null; // Book doesn't exist, should be imported
+  }
+
+  /**
+   * Extract image URL from Hardcover response
+   * Handles both string URLs and object with url property
+   */
+  private extractImageUrl(image: string | HardcoverImage | null | undefined): string | null {
+    if (!image) return null;
+    if (typeof image === 'string') return image;
+    return image.url || null;
   }
 
   /**

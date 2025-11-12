@@ -12,6 +12,7 @@ import type {
   GetBookResponse,
   HardcoverBook,
   HardcoverAuthor,
+  HardcoverImage,
 } from '../../../shared/dist/queries/hardcover.js';
 import type { BookWithAuthors } from '../../../shared/dist/types/book.js';
 import type { Author } from '../../../shared/dist/types/author.js';
@@ -116,7 +117,7 @@ export class BookService {
           externalId: String(hardcoverAuthor.id),
           name: hardcoverAuthor.name,
           bio: hardcoverAuthor.bio ?? null,
-          photoUrl: hardcoverAuthor.image?.url ?? null,
+          photoUrl: this.extractImageUrl(hardcoverAuthor.image),
         });
         authorIds.push(author.id);
         logger.debug('Author processed for book import', {
@@ -139,7 +140,7 @@ export class BookService {
         isbn: isbn,
         description: hardcoverBook.description ?? null,
         publicationDate: this.transformReleaseYear(hardcoverBook.release_year),
-        coverUrl: hardcoverBook.image?.url ?? null,
+        coverUrl: this.extractImageUrl(hardcoverBook.image),
         owned: owned,
         ownedSource: owned ? 'filesystem' : 'none',
       });
@@ -288,6 +289,16 @@ export class BookService {
    * Extract authors from Hardcover book response
    * Handles both contributions and direct authors fields
    */
+  /**
+   * Extract image URL from Hardcover response
+   * Handles both string URLs and object with url property
+   */
+  private extractImageUrl(image: string | HardcoverImage | null | undefined): string | null {
+    if (!image) return null;
+    if (typeof image === 'string') return image;
+    return image.url || null;
+  }
+
   private extractAuthors(hardcoverBook: HardcoverBook): HardcoverAuthor[] {
     // Try contributions field first (newer API format)
     if (hardcoverBook.contributions && hardcoverBook.contributions.length > 0) {

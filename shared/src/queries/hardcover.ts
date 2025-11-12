@@ -99,6 +99,42 @@ export const GET_AUTHOR_WITH_BOOKS = `
   }
 `;
 
+export const GET_AUTHOR_BY_ID = `
+  query GetAuthorById($id: Int!) {
+    authors_by_pk(id: $id) {
+      id
+      name
+      bio
+      image {
+        url
+      }
+      books_count
+    }
+  }
+`;
+
+export const GET_BOOKS_FOR_AUTHOR = `
+  query GetBooksForAuthor($id: Int!, $offset: Int!) {
+    books(
+      where: {state: {_nin: ["duplicate", "pending"]}, contributions: {author_id: {_eq: $id}}}
+      limit: 25
+      offset: $offset
+    ) {
+      id
+      title
+      description
+      release_year
+      image {
+        url
+      }
+      editions {
+        isbn_10
+        isbn_13
+      }
+    }
+  }
+`;
+
 export const SEARCH_BOOKS_BY_AUTHOR_NAME = `
   query SearchBooksByAuthorName($query: String!, $per_page: Int!, $page: Int!) {
     search(
@@ -176,4 +212,14 @@ export interface GetBookResponse {
 
 export interface GetAuthorResponse {
   authors_by_pk: HardcoverAuthorWithBooks;
+}
+
+export interface GetAuthorByIdResponse {
+  authors_by_pk: HardcoverAuthor & {
+    books_count?: number;
+  };
+}
+
+export interface GetBooksForAuthorResponse {
+  books: HardcoverBook[];
 }

@@ -1,5 +1,5 @@
 import { glob } from 'fs/promises';
-import { access, constants } from 'fs/promises';
+import { access, constants, stat } from 'fs/promises';
 import path from 'path';
 import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
@@ -44,7 +44,13 @@ class OwnershipScanner {
 
     try {
       let count = 0;
-      for await (const dirPath of glob(pattern, { onlyDirectories: true })) {
+      for await (const dirPath of glob(pattern)) {
+        // Check if this path is a directory
+        const stats = await stat(dirPath);
+        if (!stats.isDirectory()) {
+          continue;
+        }
+
         count++;
         try {
           const parts = dirPath.split(path.sep);
