@@ -1,14 +1,15 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './config/logger.js';
-import { initializeDatabase, closeDatabase } from './db/connection.js';
+import { closeDatabase } from './db/connection.js';
+import { runMigrations } from './db/migrate.js';
 import { ownershipScanner } from './services/OwnershipScanner.js';
 
 async function startServer() {
   try {
-    // Initialize database
-    logger.info('Initializing database...');
-    initializeDatabase(env.databasePath);
+    // Initialize database and run migrations
+    logger.info('Initializing database and running migrations...');
+    runMigrations(env.databasePath);
     logger.info('Database initialized successfully');
 
     // Initialize ownership scanner
