@@ -44,6 +44,7 @@ async function startServer() {
       });
 
       // Force shutdown after 10 seconds
+      // eslint-disable-next-line no-undef
       setTimeout(() => {
         logger.error('Forced shutdown after timeout');
         process.exit(1);

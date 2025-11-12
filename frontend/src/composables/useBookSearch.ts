@@ -22,9 +22,12 @@ export interface UseBookSearchReturn {
   hasSearched: Ref<boolean>;
 
   // Methods
+  // eslint-disable-next-line no-unused-vars
   search: (query: string, type: 'title' | 'author' | 'isbn', pageNum?: number) => Promise<void>;
   loadMore: () => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   importBook: (externalId: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
   importAuthor: (externalId: string) => Promise<void>;
   reset: () => void;
 }
@@ -46,6 +49,7 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Perform search
    */
+  // eslint-disable-next-line no-unused-vars
   const search = async (
     query: string,
     type: 'title' | 'author' | 'isbn',
@@ -110,6 +114,7 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Import a book
    */
+  // eslint-disable-next-line no-unused-vars
   const importBook = async (externalId: string): Promise<void> => {
     try {
       console.log(`Importing book: ${externalId}`);
@@ -140,6 +145,7 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Import an author with all their books
    */
+  // eslint-disable-next-line no-unused-vars
   const importAuthor = async (externalId: string): Promise<void> => {
     try {
       console.log(`Importing author: ${externalId}`);

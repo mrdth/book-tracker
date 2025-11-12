@@ -7,6 +7,8 @@ interface Props {
   author: AuthorListItem;
 }
 
+// Props is used by the template to access author data
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const props = defineProps<Props>();
 
 // State for bio expansion

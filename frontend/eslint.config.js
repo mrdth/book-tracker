@@ -23,6 +23,22 @@ export default [
         document: 'readonly',
         navigator: 'readonly',
         fetch: 'readonly',
+        // Browser DOM types
+        Event: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        KeyboardEvent: 'readonly',
+        // Browser APIs
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
+        AbortSignal: 'readonly',
+        RequestInit: 'readonly',
       },
     },
     plugins: {

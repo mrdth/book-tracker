@@ -5,7 +5,9 @@ interface Props {
   selectedLetter: string | null;
 }
 
+// eslint-disable-next-line no-unused-vars
 interface Emits {
+  // eslint-disable-next-line no-unused-vars
   (event: 'select', letter: string | null): void;
 }
 

@@ -74,6 +74,7 @@ const canSave = () => {
 };
 
 // Handle Escape key
+// eslint-disable-next-line no-undef
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     handleClose();
@@ -206,7 +207,9 @@ const handleKeydown = (event: KeyboardEvent) => {
 .modal-container {
   background-color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
   max-width: 32rem;
   width: 100%;
   max-height: 90vh;

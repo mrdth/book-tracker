@@ -138,12 +138,12 @@ This is a monorepo with:
 
 ### Implementation for User Story 4
 
-- [ ] T044 [US4] Update App.vue to add persistent navigation bar outside router-view in `frontend/src/App.vue`
-- [ ] T045 [US4] Add RouterLink components for Authors and Search in `frontend/src/App.vue`
-- [ ] T046 [US4] Implement active page highlighting using route.path in `frontend/src/App.vue`
-- [ ] T047 [US4] Add ARIA labels and accessibility attributes to navigation in `frontend/src/App.vue`
-- [ ] T048 [US4] Style navigation bar with Tailwind CSS (shadow, hover states, focus indicators) in `frontend/src/App.vue`
-- [ ] T049 [US4] Add aria-current="page" attribute to active link in `frontend/src/App.vue`
+- [X] T044 [US4] Update App.vue to add persistent navigation bar outside router-view in `frontend/src/App.vue`
+- [X] T045 [US4] Add RouterLink components for Authors and Search in `frontend/src/App.vue`
+- [X] T046 [US4] Implement active page highlighting using route.path in `frontend/src/App.vue`
+- [X] T047 [US4] Add ARIA labels and accessibility attributes to navigation in `frontend/src/App.vue`
+- [X] T048 [US4] Style navigation bar with Tailwind CSS (shadow, hover states, focus indicators) in `frontend/src/App.vue`
+- [X] T049 [US4] Add aria-current="page" attribute to active link in `frontend/src/App.vue`
 
 **Checkpoint**: All user stories complete - navigation bar provides consistent access to all sections
 

@@ -28,6 +28,7 @@ const handleImport = async () => {
     emit('import', props.author.externalId);
   } finally {
     // Keep loading state until parent component updates
+    // eslint-disable-next-line no-undef
     setTimeout(() => {
       isImporting.value = false;
     }, 500);
@@ -208,7 +209,9 @@ const truncateBio = (bio: string | null): string => {
 }
 
 .author-card:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .author-card__image-container {

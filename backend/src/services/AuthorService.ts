@@ -9,7 +9,7 @@ import { logger } from '../config/logger.js';
 import { errors } from '../api/middleware/errorHandler.js';
 import {
   GET_AUTHOR_WITH_BOOKS,
-  SEARCH_BOOKS_BY_AUTHOR_NAME,
+  // SEARCH_BOOKS_BY_AUTHOR_NAME, // Reserved for future use
 } from '../../../shared/dist/queries/hardcover.js';
 import type {
   GetAuthorResponse,

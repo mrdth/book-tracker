@@ -31,6 +31,7 @@ export class HardcoverClient {
           if (timeSinceLastRequest < this.minInterval) {
             const waitTime = this.minInterval - timeSinceLastRequest;
             logger.debug(`Rate limiting: waiting ${waitTime}ms before next request`);
+            // eslint-disable-next-line no-undef
             await new Promise((resolve) => setTimeout(resolve, waitTime));
           }
 
@@ -79,6 +80,7 @@ export class HardcoverClient {
             }
           );
 
+          // eslint-disable-next-line no-undef
           await new Promise((resolve) => setTimeout(resolve, backoffDelay));
         }
       }

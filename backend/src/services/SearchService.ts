@@ -11,8 +11,8 @@ import {
   SEARCH_AUTHORS_BY_NAME,
 } from '../../../shared/dist/queries/hardcover.js';
 import type {
-  SearchBooksResponse,
-  SearchAuthorsResponse,
+  // SearchBooksResponse, // Type available but not currently used
+  // SearchAuthorsResponse, // Type available but not currently used
   HardcoverBook,
   HardcoverAuthorWithBooks,
 } from '../../../shared/dist/queries/hardcover.js';

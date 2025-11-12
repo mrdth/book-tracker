@@ -2,10 +2,14 @@ import type { Request, Response, NextFunction } from 'express';
 import { logger } from '../../config/logger.js';
 
 export class AppError extends Error {
+  // ESLint doesn't understand TypeScript parameter properties - these ARE used
   constructor(
+    // eslint-disable-next-line no-unused-vars
     public statusCode: number,
+    // eslint-disable-next-line no-unused-vars
     public code: string,
     message: string,
+    // eslint-disable-next-line no-unused-vars
     public details?: unknown
   ) {
     super(message);
@@ -18,6 +22,8 @@ export function errorHandler(
   err: Error | AppError,
   req: Request,
   res: Response,
+  // NextFunction parameter required for Express error handler signature
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   _next: NextFunction
 ): void {
   if (err instanceof AppError) {
