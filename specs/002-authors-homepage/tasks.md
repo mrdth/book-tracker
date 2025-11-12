@@ -93,12 +93,12 @@ This is a monorepo with:
 
 ### Implementation for User Story 2
 
-- [ ] T028 [US2] Add hasMore state tracking to useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts`
-- [ ] T029 [US2] Implement automatic loading on scroll to bottom in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T030 [US2] Add loading indicator for pagination loads in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T031 [US2] Add end-of-list indicator when all authors loaded in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T032 [US2] Configure virtual scroller min-item-size and size-dependencies in `frontend/src/pages/AuthorsHomePage.vue`
-- [ ] T033 [US2] Implement scroll position stability during loading in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T028 [US2] Add hasMore state tracking to useAuthorsList composable in `frontend/src/composables/useAuthorsList.ts`
+- [X] T029 [US2] Implement automatic loading on scroll to bottom in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T030 [US2] Add loading indicator for pagination loads in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T031 [US2] Add end-of-list indicator when all authors loaded in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T032 [US2] Configure virtual scroller min-item-size and size-dependencies in `frontend/src/pages/AuthorsHomePage.vue`
+- [X] T033 [US2] Implement scroll position stability during loading in `frontend/src/pages/AuthorsHomePage.vue`
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work - infinite scroll pagination is functional
 
