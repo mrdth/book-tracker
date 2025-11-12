@@ -34,36 +34,14 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
-              />
-            </svg>
-            <div>
-              <h3 class="ownership-scan-page__info-item-title">Select Directory</h3>
-              <p class="ownership-scan-page__info-item-text">
-                Choose a folder containing your ebook files (EPUB, MOBI, PDF, etc.)
-              </p>
-            </div>
-          </div>
-
-          <div class="ownership-scan-page__info-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="ownership-scan-page__info-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
                 d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
               />
             </svg>
             <div>
               <h3 class="ownership-scan-page__info-item-title">Automatic Matching</h3>
               <p class="ownership-scan-page__info-item-text">
-                The scanner extracts titles and ISBNs from filenames and metadata to match books in your library
+                The scanner extracts titles and ISBNs from filenames and metadata to match books in
+                your library
               </p>
             </div>
           </div>
@@ -86,7 +64,8 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
             <div>
               <h3 class="ownership-scan-page__info-item-title">Mark as Owned</h3>
               <p class="ownership-scan-page__info-item-text">
-                Successfully matched books are automatically marked as owned with the source set to "filesystem"
+                Successfully matched books are automatically marked as owned with the source set to
+                "filesystem"
               </p>
             </div>
           </div>
@@ -137,7 +116,9 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
   background-color: white;
   border-radius: 0.75rem;
   padding: 2rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
 }
 
 .ownership-scan-page__info-title {
