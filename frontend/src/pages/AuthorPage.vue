@@ -19,6 +19,7 @@ const isRefreshing = ref(false);
 const isBulkMode = ref(false);
 const selectedBookIds = ref<Set<number>>(new Set());
 const isBulkUpdating = ref(false);
+const bookFilter = ref<'all' | 'owned' | 'not_owned'>('all');
 
 const authorId = computed(() => {
   const id = route.params.id;
@@ -155,6 +156,30 @@ const isAllSelected = computed(() => {
   return author.value.books.every((book) => selectedBookIds.value.has(book.id));
 });
 
+const filteredBooks = computed(() => {
+  if (!author.value) return [];
+
+  switch (bookFilter.value) {
+    case 'owned':
+      return author.value.books.filter((book) => book.owned);
+    case 'not_owned':
+      return author.value.books.filter((book) => !book.owned);
+    case 'all':
+    default:
+      return author.value.books;
+  }
+});
+
+const ownedBooksCount = computed(() => {
+  if (!author.value) return 0;
+  return author.value.books.filter((book) => book.owned).length;
+});
+
+const notOwnedBooksCount = computed(() => {
+  if (!author.value) return 0;
+  return author.value.books.filter((book) => !book.owned).length;
+});
+
 const handleBulkMarkAsOwned = async () => {
   if (selectedBookIds.value.size === 0 || isBulkUpdating.value) return;
 
@@ -261,10 +286,7 @@ onMounted(() => {
   <div class="author-page">
     <div class="author-page__container">
       <!-- Back Button -->
-      <button
-        class="author-page__back-button"
-        @click="handleBack"
-      >
+      <button class="author-page__back-button" @click="handleBack">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -283,10 +305,7 @@ onMounted(() => {
       </button>
 
       <!-- Loading State -->
-      <div
-        v-if="loading"
-        class="author-page__loading"
-      >
+      <div v-if="loading" class="author-page__loading">
         <svg
           class="author-page__spinner"
           xmlns="http://www.w3.org/2000/svg"
@@ -307,16 +326,11 @@ onMounted(() => {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
-        <p class="author-page__loading-text">
-          Loading author...
-        </p>
+        <p class="author-page__loading-text">Loading author...</p>
       </div>
 
       <!-- Error State -->
-      <div
-        v-else-if="error"
-        class="author-page__error"
-      >
+      <div v-else-if="error" class="author-page__error">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -335,10 +349,7 @@ onMounted(() => {
       </div>
 
       <!-- Author Content -->
-      <div
-        v-else-if="author"
-        class="author-page__content"
-      >
+      <div v-else-if="author" class="author-page__content">
         <!-- Author Header -->
         <header class="author-page__header">
           <div class="author-page__header-content">
@@ -348,11 +359,8 @@ onMounted(() => {
                 :src="author.photoUrl"
                 :alt="`Photo of ${author.name}`"
                 class="author-page__photo"
-              >
-              <div
-                v-else
-                class="author-page__photo-placeholder"
-              >
+              />
+              <div v-else class="author-page__photo-placeholder">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -455,13 +463,8 @@ onMounted(() => {
             </div>
           </div>
 
-          <div
-            v-if="author.bio"
-            class="author-page__bio"
-          >
-            <h2 class="author-page__bio-title">
-              Biography
-            </h2>
+          <div v-if="author.bio" class="author-page__bio">
+            <h2 class="author-page__bio-title">Biography</h2>
             <p class="author-page__bio-text">
               {{ author.bio }}
             </p>
@@ -471,9 +474,7 @@ onMounted(() => {
         <!-- Books Section -->
         <section class="author-page__books">
           <div class="author-page__books-header">
-            <h2 class="author-page__books-title">
-              Books
-            </h2>
+            <h2 class="author-page__books-title">Books</h2>
             <button
               v-if="author.books.length > 0 && !isBulkMode"
               class="action-button action-button--secondary"
@@ -498,6 +499,28 @@ onMounted(() => {
             </button>
           </div>
 
+          <!-- Filter Buttons -->
+          <div v-if="author.books.length > 0" class="author-page__filter-bar">
+            <button
+              :class="['filter-button', { 'filter-button--active': bookFilter === 'all' }]"
+              @click="bookFilter = 'all'"
+            >
+              All ({{ author.books.length }})
+            </button>
+            <button
+              :class="['filter-button', { 'filter-button--active': bookFilter === 'owned' }]"
+              @click="bookFilter = 'owned'"
+            >
+              Owned ({{ ownedBooksCount }})
+            </button>
+            <button
+              :class="['filter-button', { 'filter-button--active': bookFilter === 'not_owned' }]"
+              @click="bookFilter = 'not_owned'"
+            >
+              Not Owned ({{ notOwnedBooksCount }})
+            </button>
+          </div>
+
           <BulkActionBar
             v-if="isBulkMode"
             :selected-count="selectedBookIds.size"
@@ -512,10 +535,56 @@ onMounted(() => {
             @cancel="toggleBulkMode"
           />
 
-          <div
-            v-if="author.books.length === 0"
-            class="author-page__no-books"
-          >
+          <div v-if="author.books.length === 0" class="author-page__no-books">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="author-page__no-books-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+            <p class="author-page__no-books-text">No books in your library</p>
+          </div>
+
+          <div v-else-if="filteredBooks.length > 0" class="author-page__books-list">
+            <div
+              v-for="book in filteredBooks"
+              :key="book.id"
+              class="book-item"
+              :class="{ 'book-item--selected': selectedBookIds.has(book.id) }"
+            >
+              <label v-if="isBulkMode" class="book-item__checkbox">
+                <input
+                  type="checkbox"
+                  :checked="selectedBookIds.has(book.id)"
+                  class="checkbox-input"
+                  @change="toggleBookSelection(book.id)"
+                />
+              </label>
+              <div class="book-item__content">
+                <BookCard
+                  :book="convertBookToSearchResult(book)"
+                  :book-id="book.id"
+                  :show-delete="!isBulkMode"
+                  :show-author-name="false"
+                  :show-description="true"
+                  :show-ownership-toggle="!isBulkMode"
+                  @delete="handleDeleteBook(book.id)"
+                  @update-ownership="handleOwnershipUpdate"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- No results for current filter -->
+          <div v-else class="author-page__no-books">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -531,44 +600,8 @@ onMounted(() => {
               />
             </svg>
             <p class="author-page__no-books-text">
-              No books in your library
+              No {{ bookFilter === 'owned' ? 'owned' : 'unowned' }} books found
             </p>
-          </div>
-
-          <div
-            v-else
-            class="author-page__books-list"
-          >
-            <div
-              v-for="book in author.books"
-              :key="book.id"
-              class="book-item"
-              :class="{ 'book-item--selected': selectedBookIds.has(book.id) }"
-            >
-              <label
-                v-if="isBulkMode"
-                class="book-item__checkbox"
-              >
-                <input
-                  type="checkbox"
-                  :checked="selectedBookIds.has(book.id)"
-                  class="checkbox-input"
-                  @change="toggleBookSelection(book.id)"
-                >
-              </label>
-              <div class="book-item__content">
-                <BookCard
-                  :book="convertBookToSearchResult(book)"
-                  :book-id="book.id"
-                  :show-delete="!isBulkMode"
-                  :show-author-name="false"
-                  :show-description="true"
-                  :show-ownership-toggle="!isBulkMode"
-                  @delete="handleDeleteBook(book.id)"
-                  @update-ownership="handleOwnershipUpdate"
-                />
-              </div>
-            </div>
           </div>
         </section>
       </div>
@@ -857,6 +890,48 @@ onMounted(() => {
   font-weight: 600;
   color: #111827;
   margin: 0;
+}
+
+.author-page__filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.filter-button {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-button:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+  color: #374151;
+}
+
+.filter-button--active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.filter-button--active:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.filter-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 .author-page__no-books {
