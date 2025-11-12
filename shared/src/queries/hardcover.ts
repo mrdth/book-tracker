@@ -93,16 +93,6 @@ export const GET_AUTHOR_WITH_BOOKS = `
             isbn_10
             isbn_13
           }
-          contributions {
-            author {
-              id
-              name
-              bio
-              image {
-                url
-              }
-            }
-          }
         }
       }
     }
