@@ -7,7 +7,9 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
     <div class="ownership-scan-page__container">
       <!-- Header -->
       <header class="ownership-scan-page__header">
-        <h1 class="ownership-scan-page__title">Ownership Scanner</h1>
+        <h1 class="ownership-scan-page__title">
+          Ownership Scanner
+        </h1>
         <p class="ownership-scan-page__subtitle">
           Scan your filesystem to automatically mark books as owned based on your local files
         </p>
@@ -20,7 +22,9 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
 
       <!-- Information Section -->
       <div class="ownership-scan-page__info">
-        <h2 class="ownership-scan-page__info-title">How it works</h2>
+        <h2 class="ownership-scan-page__info-title">
+          How it works
+        </h2>
         <div class="ownership-scan-page__info-content">
           <div class="ownership-scan-page__info-item">
             <svg
@@ -38,7 +42,9 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
               />
             </svg>
             <div>
-              <h3 class="ownership-scan-page__info-item-title">Automatic Matching</h3>
+              <h3 class="ownership-scan-page__info-item-title">
+                Automatic Matching
+              </h3>
               <p class="ownership-scan-page__info-item-text">
                 The scanner extracts titles and ISBNs from filenames and metadata to match books in
                 your library
@@ -62,7 +68,9 @@ import OwnershipScanPanel from '../components/common/OwnershipScanPanel.vue';
               />
             </svg>
             <div>
-              <h3 class="ownership-scan-page__info-item-title">Mark as Owned</h3>
+              <h3 class="ownership-scan-page__info-item-title">
+                Mark as Owned
+              </h3>
               <p class="ownership-scan-page__info-item-text">
                 Successfully matched books are automatically marked as owned with the source set to
                 "filesystem"

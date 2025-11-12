@@ -75,7 +75,7 @@ const canPerformActions = computed(() => {
             :indeterminate="selectedCount > 0 && !allSelected"
             :disabled="loading"
             @change="handleToggleSelectAll"
-          />
+          >
           <span class="checkbox-text">{{ selectionText }}</span>
         </label>
       </div>
@@ -161,14 +161,24 @@ const canPerformActions = computed(() => {
       </div>
     </div>
 
-    <div v-if="loading" class="bulk-action-bar__loading">
+    <div
+      v-if="loading"
+      class="bulk-action-bar__loading"
+    >
       <svg
         class="loading-spinner"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
       >
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        />
         <path
           class="opacity-75"
           fill="currentColor"
