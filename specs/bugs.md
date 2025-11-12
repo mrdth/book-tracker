@@ -4,4 +4,8 @@ Issues:
 
 
 feature suggestions:
+- On author page be able to filter which books are shown:
+  - all
+  - owned
+  - not owned
 - fuzzy matching of local book titles during owned check

@@ -75,7 +75,7 @@ const canPerformActions = computed(() => {
             :indeterminate="selectedCount > 0 && !allSelected"
             :disabled="loading"
             @change="handleToggleSelectAll"
-          >
+          />
           <span class="checkbox-text">{{ selectionText }}</span>
         </label>
       </div>
@@ -161,24 +161,14 @@ const canPerformActions = computed(() => {
       </div>
     </div>
 
-    <div
-      v-if="loading"
-      class="bulk-action-bar__loading"
-    >
+    <div v-if="loading" class="bulk-action-bar__loading">
       <svg
         class="loading-spinner"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
       >
-        <circle
-          class="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          stroke-width="4"
-        />
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
         <path
           class="opacity-75"
           fill="currentColor"
@@ -193,14 +183,16 @@ const canPerformActions = computed(() => {
 <style scoped>
 .bulk-action-bar {
   position: sticky;
-  top: 0;
+  top: 80px;
   z-index: 10;
   background-color: #f3f4f6;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .bulk-action-bar__content {

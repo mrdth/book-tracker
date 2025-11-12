@@ -9,6 +9,7 @@ interface Props {
   loading?: boolean;
   showDelete?: boolean; // Show delete button for imported books
   showOwnershipToggle?: boolean; // Show ownership toggle for imported books
+  showAuthorName?: boolean; // Show author name for imported books
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   showDelete: false,
   showOwnershipToggle: false,
+  showAuthorName: true,
 });
 
 const emit = defineEmits<{
@@ -118,11 +120,8 @@ const canShowOwnershipToggle = (): boolean => {
         :alt="`Cover of ${book.title}`"
         class="book-card__image"
         loading="lazy"
-      >
-      <div
-        v-else
-        class="book-card__image-placeholder"
-      >
+      />
+      <div v-else class="book-card__image-placeholder">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -145,21 +144,15 @@ const canShowOwnershipToggle = (): boolean => {
         <h3 class="book-card__title">
           {{ book.title }}
         </h3>
-        <StatusBadge
-          :status="book.status"
-          size="sm"
-        />
+        <StatusBadge :status="book.status" size="sm" />
       </div>
 
-      <p class="book-card__author">
+      <p v-if="showAuthorName" class="book-card__author">
         {{ getAuthorNames() }}
       </p>
 
       <div class="book-card__metadata">
-        <span
-          v-if="book.isbn"
-          class="book-card__metadata-item"
-        > ISBN: {{ book.isbn }} </span>
+        <span v-if="book.isbn" class="book-card__metadata-item"> ISBN: {{ book.isbn }} </span>
         <span class="book-card__metadata-item">
           {{ formatPublicationDate(book.publicationDate) }}
         </span>
@@ -181,11 +174,7 @@ const canShowOwnershipToggle = (): boolean => {
           stroke="currentColor"
           class="book-card__button-icon"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
         <svg
           v-else
@@ -212,10 +201,7 @@ const canShowOwnershipToggle = (): boolean => {
       </button>
 
       <!-- Action buttons row -->
-      <div
-        v-if="canDelete() || canShowOwnershipToggle()"
-        class="book-card__actions"
-      >
+      <div v-if="canDelete() || canShowOwnershipToggle()" class="book-card__actions">
         <button
           v-if="canDelete()"
           :disabled="isDeleting || loading"
@@ -263,10 +249,7 @@ const canShowOwnershipToggle = (): boolean => {
         </button>
 
         <!-- Ownership dropdown button -->
-        <div
-          v-if="canShowOwnershipToggle()"
-          class="book-card__ownership-dropdown"
-        >
+        <div v-if="canShowOwnershipToggle()" class="book-card__ownership-dropdown">
           <button
             :disabled="loading"
             class="book-card__ownership-button"
@@ -292,14 +275,8 @@ const canShowOwnershipToggle = (): boolean => {
           </button>
 
           <!-- Dropdown menu -->
-          <div
-            v-if="showOwnershipDropdown"
-            class="book-card__dropdown-menu"
-          >
-            <button
-              class="book-card__dropdown-item"
-              @click="handleToggleOwnership"
-            >
+          <div v-if="showOwnershipDropdown" class="book-card__dropdown-menu">
+            <button class="book-card__dropdown-item" @click="handleToggleOwnership">
               {{ book.owned ? 'Mark as Not Owned' : 'Mark as Owned' }}
             </button>
           </div>
@@ -313,10 +290,7 @@ const canShowOwnershipToggle = (): boolean => {
         </div>
       </div>
 
-      <div
-        v-else-if="book.status === 'deleted'"
-        class="book-card__deleted-message"
-      >
+      <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
         This book was previously deleted
       </div>
 
