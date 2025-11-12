@@ -45,8 +45,6 @@ export class HardcoverClient {
           this.lastRequest = Date.now();
           const response = await this.client.request<T>(query, variables);
 
-          logger.debug('Hardcover API response: ', JSON.stringify(response));
-
           logger.info('Hardcover API request successful', {
             attempt: attempt + 1,
           });

@@ -42,6 +42,10 @@ export class AuthorService {
     this.bookAuthorModel = new BookAuthorModel(this.db);
   }
 
+  private async wait(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
   /**
    * Fetch all books for an author from Hardcover API in batches
    * Handles pagination to overcome the 100 contribution limit
@@ -49,7 +53,7 @@ export class AuthorService {
   private async fetchAllBooksForAuthor(authorId: number): Promise<HardcoverBook[]> {
     const allBooks: HardcoverBook[] = [];
     let offset = 0;
-    const batchSize = 50;
+    const batchSize = 25;
     let hasMore = true;
 
     logger.info('Starting batch fetch of books for author', { authorId });
@@ -79,6 +83,7 @@ export class AuthorService {
           hasMore = false;
         } else {
           offset += batchSize;
+          await this.wait(1000);
         }
       } catch (error) {
         logger.error('Failed to fetch book batch', error, { authorId, offset });
