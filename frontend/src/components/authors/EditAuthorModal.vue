@@ -74,7 +74,7 @@ const canSave = () => {
 };
 
 // Handle Escape key
-// eslint-disable-next-line no-undef
+ 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape') {
     handleClose();
@@ -85,15 +85,30 @@ const handleKeydown = (event: KeyboardEvent) => {
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="open" class="modal-overlay" @click.self="handleClose" @keydown="handleKeydown">
-        <div class="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div
+        v-if="open"
+        class="modal-overlay"
+        @click.self="handleClose"
+        @keydown="handleKeydown"
+      >
+        <div
+          class="modal-container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
           <div class="modal-header">
-            <h2 id="modal-title" class="modal-title">Edit Author</h2>
+            <h2
+              id="modal-title"
+              class="modal-title"
+            >
+              Edit Author
+            </h2>
             <button
-              @click="handleClose"
               class="modal-close-button"
               aria-label="Close modal"
               :disabled="isSaving"
+              @click="handleClose"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -103,14 +118,24 @@ const handleKeydown = (event: KeyboardEvent) => {
                 stroke="currentColor"
                 class="modal-close-icon"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
 
-          <form @submit.prevent="handleSave" class="modal-form">
+          <form
+            class="modal-form"
+            @submit.prevent="handleSave"
+          >
             <div class="form-group">
-              <label for="author-name" class="form-label">Name *</label>
+              <label
+                for="author-name"
+                class="form-label"
+              >Name *</label>
               <input
                 id="author-name"
                 v-model="name"
@@ -120,12 +145,20 @@ const handleKeydown = (event: KeyboardEvent) => {
                 placeholder="Enter author name"
                 required
                 :disabled="isSaving"
-              />
-              <p v-if="!isNameValid()" class="form-error">Author name is required</p>
+              >
+              <p
+                v-if="!isNameValid()"
+                class="form-error"
+              >
+                Author name is required
+              </p>
             </div>
 
             <div class="form-group">
-              <label for="author-bio" class="form-label">Biography</label>
+              <label
+                for="author-bio"
+                class="form-label"
+              >Biography</label>
               <textarea
                 id="author-bio"
                 v-model="bio"
@@ -133,11 +166,14 @@ const handleKeydown = (event: KeyboardEvent) => {
                 placeholder="Enter author biography"
                 rows="5"
                 :disabled="isSaving"
-              ></textarea>
+              />
             </div>
 
             <div class="form-group">
-              <label for="author-photo" class="form-label">Photo URL</label>
+              <label
+                for="author-photo"
+                class="form-label"
+              >Photo URL</label>
               <input
                 id="author-photo"
                 v-model="photoUrl"
@@ -145,19 +181,23 @@ const handleKeydown = (event: KeyboardEvent) => {
                 class="form-input"
                 placeholder="https://example.com/photo.jpg"
                 :disabled="isSaving"
-              />
+              >
             </div>
 
             <div class="modal-actions">
               <button
                 type="button"
-                @click="handleClose"
                 class="modal-cancel-button"
                 :disabled="isSaving"
+                @click="handleClose"
               >
                 Cancel
               </button>
-              <button type="submit" class="modal-save-button" :disabled="!canSave()">
+              <button
+                type="submit"
+                class="modal-save-button"
+                :disabled="!canSave()"
+              >
                 <svg
                   v-if="isSaving"
                   class="button-spinner"
@@ -172,12 +212,12 @@ const handleKeydown = (event: KeyboardEvent) => {
                     r="10"
                     stroke="currentColor"
                     stroke-width="4"
-                  ></circle>
+                  />
                   <path
                     class="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                  />
                 </svg>
                 <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
               </button>

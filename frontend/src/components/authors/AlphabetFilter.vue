@@ -5,7 +5,7 @@ interface Props {
   selectedLetter: string | null;
 }
 
-// eslint-disable-next-line no-unused-vars
+ 
 interface Emits {
   // eslint-disable-next-line no-unused-vars
   (event: 'select', letter: string | null): void;
@@ -63,7 +63,10 @@ const isAllSelected = computed(() => props.selectedLetter === null);
         </button>
 
         <!-- Separator -->
-        <div class="w-px h-6 bg-gray-300" aria-hidden="true"></div>
+        <div
+          class="w-px h-6 bg-gray-300"
+          aria-hidden="true"
+        />
 
         <!-- Letter Buttons A-Z -->
         <button
@@ -85,7 +88,10 @@ const isAllSelected = computed(() => props.selectedLetter === null);
       </div>
 
       <!-- Active Filter Indicator -->
-      <div v-if="selectedLetter" class="flex items-center text-sm text-gray-600">
+      <div
+        v-if="selectedLetter"
+        class="flex items-center text-sm text-gray-600"
+      >
         <svg
           class="w-4 h-4 mr-1.5 text-blue-600"
           fill="none"
@@ -99,13 +105,11 @@ const isAllSelected = computed(() => props.selectedLetter === null);
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
-        <span
-          >Showing authors with last names starting with <strong>{{ selectedLetter }}</strong></span
-        >
+        <span>Showing authors with last names starting with <strong>{{ selectedLetter }}</strong></span>
         <button
-          @click="selectLetter(null)"
           class="ml-2 text-blue-600 hover:text-blue-800 underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
           aria-label="Clear filter"
+          @click="selectLetter(null)"
         >
           Clear
         </button>

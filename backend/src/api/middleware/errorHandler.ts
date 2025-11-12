@@ -23,7 +23,7 @@ export function errorHandler(
   req: Request,
   res: Response,
   // NextFunction parameter required for Express error handler signature
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  // eslint-disable-next-line no-unused-vars
   _next: NextFunction
 ): void {
   if (err instanceof AppError) {

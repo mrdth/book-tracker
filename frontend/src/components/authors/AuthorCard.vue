@@ -28,7 +28,7 @@ const handleImport = async () => {
     emit('import', props.author.externalId);
   } finally {
     // Keep loading state until parent component updates
-    // eslint-disable-next-line no-undef
+     
     setTimeout(() => {
       isImporting.value = false;
     }, 500);
@@ -71,8 +71,11 @@ const truncateBio = (bio: string | null): string => {
         :alt="`Photo of ${author.name}`"
         class="author-card__image"
         loading="lazy"
-      />
-      <div v-else class="author-card__image-placeholder">
+      >
+      <div
+        v-else
+        class="author-card__image-placeholder"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -92,21 +95,26 @@ const truncateBio = (bio: string | null): string => {
 
     <div class="author-card__content">
       <div class="author-card__header">
-        <h3 class="author-card__name">{{ author.name }}</h3>
+        <h3 class="author-card__name">
+          {{ author.name }}
+        </h3>
         <span class="author-card__book-count">{{ formatBookCount() }}</span>
       </div>
 
-      <p v-if="author.bio" class="author-card__bio">
+      <p
+        v-if="author.bio"
+        class="author-card__bio"
+      >
         {{ truncateBio(author.bio) }}
       </p>
 
       <div class="author-card__actions">
         <button
           v-if="canImport()"
-          @click="handleImport"
           :disabled="isImporting || loading"
           class="author-card__import-button"
           :aria-label="`Import all books by ${author.name}`"
+          @click="handleImport"
         >
           <svg
             v-if="!isImporting"
@@ -137,21 +145,21 @@ const truncateBio = (bio: string | null): string => {
               r="10"
               stroke="currentColor"
               stroke-width="4"
-            ></circle>
+            />
             <path
               class="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
           <span>{{ isImporting ? 'Importing all books...' : 'Import all books' }}</span>
         </button>
 
         <button
           v-if="canView()"
-          @click="handleView"
           class="author-card__view-button"
           :aria-label="`View ${author.name}'s profile`"
+          @click="handleView"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +184,10 @@ const truncateBio = (bio: string | null): string => {
         </button>
       </div>
 
-      <div v-if="author.status === 'imported'" class="author-card__imported-badge">
+      <div
+        v-if="author.status === 'imported'"
+        class="author-card__imported-badge"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

@@ -73,19 +73,19 @@ const canPerformActions = computed(() => {
             class="checkbox-input"
             :checked="allSelected"
             :indeterminate="selectedCount > 0 && !allSelected"
-            @change="handleToggleSelectAll"
             :disabled="loading"
-          />
+            @change="handleToggleSelectAll"
+          >
           <span class="checkbox-text">{{ selectionText }}</span>
         </label>
       </div>
 
       <div class="bulk-action-bar__actions">
         <button
-          @click="handleMarkAsOwned"
           :disabled="!canPerformActions"
           class="action-button action-button--primary"
           title="Mark selected books as owned"
+          @click="handleMarkAsOwned"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -105,10 +105,10 @@ const canPerformActions = computed(() => {
         </button>
 
         <button
-          @click="handleMarkAsNotOwned"
           :disabled="!canPerformActions"
           class="action-button action-button--secondary"
           title="Mark selected books as not owned"
+          @click="handleMarkAsNotOwned"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -128,10 +128,10 @@ const canPerformActions = computed(() => {
         </button>
 
         <button
-          @click="handleDelete"
           :disabled="!canPerformActions"
           class="action-button action-button--danger"
           title="Delete selected books"
+          @click="handleDelete"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -151,17 +151,20 @@ const canPerformActions = computed(() => {
         </button>
 
         <button
-          @click="handleCancel"
           class="action-button action-button--cancel"
           title="Exit bulk action mode"
           :disabled="loading"
+          @click="handleCancel"
         >
           <span class="action-text">Cancel</span>
         </button>
       </div>
     </div>
 
-    <div v-if="loading" class="bulk-action-bar__loading">
+    <div
+      v-if="loading"
+      class="bulk-action-bar__loading"
+    >
       <svg
         class="loading-spinner"
         xmlns="http://www.w3.org/2000/svg"
@@ -175,12 +178,12 @@ const canPerformActions = computed(() => {
           r="10"
           stroke="currentColor"
           stroke-width="4"
-        ></circle>
+        />
         <path
           class="opacity-75"
           fill="currentColor"
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-        ></path>
+        />
       </svg>
       <span>Processing...</span>
     </div>

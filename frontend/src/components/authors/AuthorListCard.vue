@@ -40,13 +40,16 @@ const truncatedName = (name: string): string => {
     <div class="flex items-start gap-4">
       <!-- Circular Photo -->
       <div class="flex-shrink-0">
-        <div v-if="author.photoUrl" class="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+        <div
+          v-if="author.photoUrl"
+          class="w-16 h-16 rounded-full overflow-hidden bg-gray-100"
+        >
           <img
             :src="author.photoUrl"
             :alt="`Photo of ${author.name}`"
             class="w-full h-full object-cover"
             @error="($event.target as HTMLImageElement).src = ''"
-          />
+          >
         </div>
         <!-- Placeholder for missing photo -->
         <div
@@ -79,7 +82,10 @@ const truncatedName = (name: string): string => {
         </p>
 
         <!-- Bio with 3-line truncation and expand/collapse -->
-        <div v-if="author.bio" class="text-sm text-gray-700">
+        <div
+          v-if="author.bio"
+          class="text-sm text-gray-700"
+        >
           <p
             :class="['bio-text', { 'line-clamp-3': !bioExpanded, 'cursor-pointer': !bioExpanded }]"
             @click="!bioExpanded && toggleBio()"
@@ -89,23 +95,28 @@ const truncatedName = (name: string): string => {
           <!-- Show Less button when expanded -->
           <button
             v-if="bioExpanded"
-            @click="toggleBio"
             class="text-blue-600 hover:text-blue-800 text-sm mt-1 font-medium"
+            @click="toggleBio"
           >
             Show less
           </button>
           <!-- Show More button hint (only visible if text is actually truncated) -->
           <button
             v-else-if="author.bio.length > 200"
-            @click="toggleBio"
             class="text-blue-600 hover:text-blue-800 text-sm mt-1 font-medium"
+            @click="toggleBio"
           >
             Show more
           </button>
         </div>
 
         <!-- Empty bio message -->
-        <p v-else class="text-sm text-gray-400 italic">No biography available</p>
+        <p
+          v-else
+          class="text-sm text-gray-400 italic"
+        >
+          No biography available
+        </p>
       </div>
     </div>
   </div>

@@ -59,29 +59,38 @@ const getPlaceholder = () => {
 </script>
 
 <template>
-  <form @submit="handleSubmit" class="search-bar">
+  <form
+    class="search-bar"
+    @submit="handleSubmit"
+  >
     <div class="search-bar__container">
       <select
         :value="localType"
-        @change="handleTypeChange"
         :disabled="disabled"
         class="search-bar__type-select"
         aria-label="Search type"
+        @change="handleTypeChange"
       >
-        <option value="author">Author</option>
-        <option value="title">Title</option>
-        <option value="isbn">ISBN</option>
+        <option value="author">
+          Author
+        </option>
+        <option value="title">
+          Title
+        </option>
+        <option value="isbn">
+          ISBN
+        </option>
       </select>
 
       <input
         type="text"
         :value="localQuery"
-        @input="handleInput"
         :placeholder="getPlaceholder()"
         :disabled="disabled"
         class="search-bar__input"
         aria-label="Search query"
-      />
+        @input="handleInput"
+      >
 
       <button
         type="submit"

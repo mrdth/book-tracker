@@ -39,7 +39,9 @@ const clearResult = () => {
 <template>
   <div class="ownership-scan-panel">
     <div class="ownership-scan-panel__header">
-      <h3 class="ownership-scan-panel__title">Ownership Scanner</h3>
+      <h3 class="ownership-scan-panel__title">
+        Ownership Scanner
+      </h3>
       <p class="ownership-scan-panel__description">
         Scan your filesystem to automatically detect which books you own based on your collection
         directory structure.
@@ -53,16 +55,16 @@ const clearResult = () => {
           type="checkbox"
           :disabled="isScanning"
           class="ownership-scan-panel__checkbox-input"
-        />
+        >
         <span class="ownership-scan-panel__checkbox-label">
           Force refresh (bypass cache)
         </span>
       </label>
 
       <button
-        @click="handleScan"
         :disabled="isScanning"
         class="ownership-scan-panel__scan-button"
+        @click="handleScan"
       >
         <svg
           v-if="!isScanning"
@@ -93,19 +95,22 @@ const clearResult = () => {
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
         <span>{{ isScanning ? 'Scanning...' : 'Scan Filesystem' }}</span>
       </button>
     </div>
 
     <!-- Success Result -->
-    <div v-if="scanResult" class="ownership-scan-panel__result ownership-scan-panel__result--success">
+    <div
+      v-if="scanResult"
+      class="ownership-scan-panel__result ownership-scan-panel__result--success"
+    >
       <div class="ownership-scan-panel__result-header">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -119,11 +124,13 @@ const clearResult = () => {
             clip-rule="evenodd"
           />
         </svg>
-        <h4 class="ownership-scan-panel__result-title">Scan Complete</h4>
+        <h4 class="ownership-scan-panel__result-title">
+          Scan Complete
+        </h4>
         <button
-          @click="clearResult"
           class="ownership-scan-panel__result-close"
           aria-label="Close result"
+          @click="clearResult"
         >
           ×
         </button>
@@ -145,7 +152,10 @@ const clearResult = () => {
     </div>
 
     <!-- Error Result -->
-    <div v-if="error" class="ownership-scan-panel__result ownership-scan-panel__result--error">
+    <div
+      v-if="error"
+      class="ownership-scan-panel__result ownership-scan-panel__result--error"
+    >
       <div class="ownership-scan-panel__result-header">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -159,16 +169,20 @@ const clearResult = () => {
             clip-rule="evenodd"
           />
         </svg>
-        <h4 class="ownership-scan-panel__result-title">Scan Failed</h4>
+        <h4 class="ownership-scan-panel__result-title">
+          Scan Failed
+        </h4>
         <button
-          @click="clearResult"
           class="ownership-scan-panel__result-close"
           aria-label="Close error"
+          @click="clearResult"
         >
           ×
         </button>
       </div>
-      <p class="ownership-scan-panel__result-message">{{ error }}</p>
+      <p class="ownership-scan-panel__result-message">
+        {{ error }}
+      </p>
     </div>
   </div>
 </template>

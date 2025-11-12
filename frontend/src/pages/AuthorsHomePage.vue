@@ -55,15 +55,22 @@ onMounted(() => {
     <!-- Page Header -->
     <div class="bg-white shadow-sm border-b border-gray-200 mb-6">
       <div class="max-w-7xl mx-auto px-4 py-6">
-        <h1 class="text-3xl font-bold text-gray-900">Authors</h1>
-        <p class="text-gray-600 mt-2">Browse your author collection</p>
+        <h1 class="text-3xl font-bold text-gray-900">
+          Authors
+        </h1>
+        <p class="text-gray-600 mt-2">
+          Browse your author collection
+        </p>
       </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4">
       <!-- Alphabet Filter -->
       <div class="mb-6">
-        <AlphabetFilter :selected-letter="letterFilter" @select="handleLetterSelect" />
+        <AlphabetFilter
+          :selected-letter="letterFilter"
+          @select="handleLetterSelect"
+        />
       </div>
 
       <!-- Initial Loading State -->
@@ -71,8 +78,10 @@ onMounted(() => {
         v-if="loading && authors.length === 0"
         class="flex flex-col items-center justify-center py-16"
       >
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <p class="text-gray-600">Loading authors...</p>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4" />
+        <p class="text-gray-600">
+          Loading authors...
+        </p>
       </div>
 
       <!-- Error State -->
@@ -81,7 +90,12 @@ onMounted(() => {
         class="flex flex-col items-center justify-center py-16"
       >
         <div class="text-red-600 mb-4">
-          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-16 h-16 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -90,11 +104,15 @@ onMounted(() => {
             />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 mb-2">Failed to load authors</h2>
-        <p class="text-gray-600 mb-4">{{ error.message }}</p>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">
+          Failed to load authors
+        </h2>
+        <p class="text-gray-600 mb-4">
+          {{ error.message }}
+        </p>
         <button
-          @click="retry"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          @click="retry"
         >
           Retry
         </button>
@@ -106,7 +124,12 @@ onMounted(() => {
         class="flex flex-col items-center justify-center py-16"
       >
         <div class="text-gray-400 mb-4">
-          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-16 h-16 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -118,21 +141,32 @@ onMounted(() => {
         <h2 class="text-xl font-semibold text-gray-900 mb-2">
           {{ letterFilter ? `No authors found for letter ${letterFilter}` : 'No authors found' }}
         </h2>
-        <p v-if="letterFilter" class="text-gray-600 mb-4">
+        <p
+          v-if="letterFilter"
+          class="text-gray-600 mb-4"
+        >
           Try selecting a different letter or clear the filter to see all authors.
         </p>
-        <p v-else class="text-gray-600">Start by importing some authors to your collection.</p>
+        <p
+          v-else
+          class="text-gray-600"
+        >
+          Start by importing some authors to your collection.
+        </p>
         <button
           v-if="letterFilter"
-          @click="handleLetterSelect(null)"
           class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          @click="handleLetterSelect(null)"
         >
           Clear Filter
         </button>
       </div>
 
       <!-- Authors List with Virtual Scrolling -->
-      <div v-else class="authors-list-container">
+      <div
+        v-else
+        class="authors-list-container"
+      >
         <DynamicScroller
           :items="authors"
           :min-item-size="200"
@@ -154,9 +188,14 @@ onMounted(() => {
         </DynamicScroller>
 
         <!-- Pagination Loading Indicator -->
-        <div v-if="loading && authors.length > 0" class="flex items-center justify-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-          <p class="text-gray-600">Loading more authors...</p>
+        <div
+          v-if="loading && authors.length > 0"
+          class="flex items-center justify-center py-8"
+        >
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3" />
+          <p class="text-gray-600">
+            Loading more authors...
+          </p>
         </div>
 
         <!-- End of List Indicator -->
@@ -164,7 +203,12 @@ onMounted(() => {
           v-if="!hasMore && authors.length > 0 && !loading"
           class="flex items-center justify-center py-8 text-gray-500"
         >
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -176,11 +220,16 @@ onMounted(() => {
         </div>
 
         <!-- Pagination Error (if error occurs during pagination) -->
-        <div v-if="error && authors.length > 0" class="flex flex-col items-center py-8">
-          <p class="text-red-600 mb-3">Failed to load more authors: {{ error.message }}</p>
+        <div
+          v-if="error && authors.length > 0"
+          class="flex flex-col items-center py-8"
+        >
+          <p class="text-red-600 mb-3">
+            Failed to load more authors: {{ error.message }}
+          </p>
           <button
-            @click="loadMore"
             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            @click="loadMore"
           >
             Try Again
           </button>

@@ -71,7 +71,9 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
     <div class="search-page__container">
       <!-- Header -->
       <header class="search-page__header">
-        <h1 class="search-page__title">Book Tracker</h1>
+        <h1 class="search-page__title">
+          Book Tracker
+        </h1>
         <p class="search-page__subtitle">
           Search for books by title, author, or ISBN and add them to your library
         </p>
@@ -79,7 +81,10 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
 
       <!-- Search Bar -->
       <div class="search-page__search">
-        <SearchBar @search="handleSearch" :disabled="loading" />
+        <SearchBar
+          :disabled="loading"
+          @search="handleSearch"
+        />
       </div>
 
       <!-- Ownership Scanner -->
@@ -88,7 +93,10 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
       </div>
 
       <!-- Import Error -->
-      <div v-if="importError" class="search-page__error search-page__error--import">
+      <div
+        v-if="importError"
+        class="search-page__error search-page__error--import"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -101,18 +109,23 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
             clip-rule="evenodd"
           />
         </svg>
-        <p class="search-page__error-text">{{ importError }}</p>
+        <p class="search-page__error-text">
+          {{ importError }}
+        </p>
         <button
-          @click="importError = null"
           class="search-page__error-dismiss"
           aria-label="Dismiss error"
+          @click="importError = null"
         >
           ×
         </button>
       </div>
 
       <!-- Search Error -->
-      <div v-if="error" class="search-page__error">
+      <div
+        v-if="error"
+        class="search-page__error"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -125,11 +138,16 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
             clip-rule="evenodd"
           />
         </svg>
-        <p class="search-page__error-text">{{ error }}</p>
+        <p class="search-page__error-text">
+          {{ error }}
+        </p>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading && !hasResults" class="search-page__loading">
+      <div
+        v-if="loading && !hasResults"
+        class="search-page__loading"
+      >
         <svg
           class="search-page__spinner"
           xmlns="http://www.w3.org/2000/svg"
@@ -143,18 +161,23 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
             r="10"
             stroke="currentColor"
             stroke-width="4"
-          ></circle>
+          />
           <path
             class="opacity-75"
             fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
+          />
         </svg>
-        <p class="search-page__loading-text">Searching...</p>
+        <p class="search-page__loading-text">
+          Searching...
+        </p>
       </div>
 
       <!-- Empty State (No Results) -->
-      <div v-else-if="hasSearched && !hasResults && !loading" class="search-page__empty">
+      <div
+        v-else-if="hasSearched && !hasResults && !loading"
+        class="search-page__empty"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -169,12 +192,19 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
             d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
           />
         </svg>
-        <p class="search-page__empty-text">No results found</p>
-        <p class="search-page__empty-hint">Try adjusting your search query or search type</p>
+        <p class="search-page__empty-text">
+          No results found
+        </p>
+        <p class="search-page__empty-hint">
+          Try adjusting your search query or search type
+        </p>
       </div>
 
       <!-- Results -->
-      <div v-else-if="hasResults" class="search-page__results">
+      <div
+        v-else-if="hasResults"
+        class="search-page__results"
+      >
         <div class="search-page__results-header">
           <h2 class="search-page__results-title">
             {{ results.length }} result{{ results.length !== 1 ? 's' : '' }}
@@ -182,7 +212,10 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
         </div>
 
         <div class="search-page__results-list">
-          <template v-for="result in results" :key="result.externalId">
+          <template
+            v-for="result in results"
+            :key="result.externalId"
+          >
             <!-- Book Results -->
             <BookCard
               v-if="isBookResult(result)"
@@ -203,8 +236,15 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
         </div>
 
         <!-- Load More Button -->
-        <div v-if="hasMore" class="search-page__load-more">
-          <button @click="handleLoadMore" :disabled="loading" class="search-page__load-more-button">
+        <div
+          v-if="hasMore"
+          class="search-page__load-more"
+        >
+          <button
+            :disabled="loading"
+            class="search-page__load-more-button"
+            @click="handleLoadMore"
+          >
             <svg
               v-if="!loading"
               xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +266,10 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
       </div>
 
       <!-- Initial State -->
-      <div v-else class="search-page__initial">
+      <div
+        v-else
+        class="search-page__initial"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -241,8 +284,12 @@ const isAuthorResult = (result: (typeof results.value)[number]): result is Autho
             d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
           />
         </svg>
-        <p class="search-page__initial-text">Search for books to get started</p>
-        <p class="search-page__initial-hint">Enter a book title, author name, or ISBN above</p>
+        <p class="search-page__initial-text">
+          Search for books to get started
+        </p>
+        <p class="search-page__initial-hint">
+          Enter a book title, author name, or ISBN above
+        </p>
       </div>
     </div>
   </div>
