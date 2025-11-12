@@ -49,7 +49,7 @@ export class AuthorService {
   private async fetchAllBooksForAuthor(authorId: number): Promise<HardcoverBook[]> {
     const allBooks: HardcoverBook[] = [];
     let offset = 0;
-    const batchSize = 25;
+    const batchSize = 50;
     let hasMore = true;
 
     logger.info('Starting batch fetch of books for author', { authorId });
