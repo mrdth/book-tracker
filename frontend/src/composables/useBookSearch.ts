@@ -49,7 +49,7 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Perform search
    */
-   
+
   const search = async (
     query: string,
     type: 'title' | 'author' | 'isbn',
@@ -84,8 +84,6 @@ export function useBookSearch(): UseBookSearchReturn {
 
       hasMore.value = response.pagination.hasMore;
       hasSearched.value = true;
-
-      console.log(`Search completed: ${response.results.length} results found`);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to perform search';
       console.error('Search error:', err);
@@ -114,11 +112,9 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Import a book
    */
-   
+
   const importBook = async (externalId: string): Promise<void> => {
     try {
-      console.log(`Importing book: ${externalId}`);
-
       await apiClient.importBook({ externalId });
 
       // Update the book status in results
@@ -133,8 +129,6 @@ export function useBookSearch(): UseBookSearchReturn {
           status: 'imported',
         };
       }
-
-      console.log(`Book imported successfully: ${externalId}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to import book';
       console.error('Import error:', err);
@@ -145,11 +139,9 @@ export function useBookSearch(): UseBookSearchReturn {
   /**
    * Import an author with all their books
    */
-   
+
   const importAuthor = async (externalId: string): Promise<void> => {
     try {
-      console.log(`Importing author: ${externalId}`);
-
       await apiClient.importAuthor({ externalId });
 
       // Update the author status in results
@@ -164,8 +156,6 @@ export function useBookSearch(): UseBookSearchReturn {
           status: 'imported',
         };
       }
-
-      console.log(`Author imported successfully: ${externalId}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to import author';
       console.error('Import error:', err);

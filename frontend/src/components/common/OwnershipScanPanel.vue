@@ -21,10 +21,8 @@ const handleScan = async () => {
   try {
     const result = await apiClient.triggerOwnershipScan(forceRefresh.value);
     scanResult.value = result;
-    console.log('Ownership scan completed', result);
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to scan ownership';
-    console.error('Ownership scan error:', err);
   } finally {
     isScanning.value = false;
   }
@@ -56,9 +54,7 @@ const clearResult = () => {
           :disabled="isScanning"
           class="ownership-scan-panel__checkbox-input"
         >
-        <span class="ownership-scan-panel__checkbox-label">
-          Force refresh (bypass cache)
-        </span>
+        <span class="ownership-scan-panel__checkbox-label"> Force refresh (bypass cache) </span>
       </label>
 
       <button
