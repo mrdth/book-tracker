@@ -10,6 +10,7 @@ interface Props {
   showDelete?: boolean; // Show delete button for imported books
   showOwnershipToggle?: boolean; // Show ownership toggle for imported books
   showAuthorName?: boolean; // Show author name for imported books
+  showDescription?: boolean; // Show book description
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   showDelete: false,
   showOwnershipToggle: false,
   showAuthorName: true,
+  showDescription: false,
 });
 
 const emit = defineEmits<{
@@ -29,6 +31,7 @@ const emit = defineEmits<{
 const isImporting = ref(false);
 const isDeleting = ref(false);
 const showOwnershipDropdown = ref(false);
+const descriptionExpanded = ref(false);
 
 const handleImport = async () => {
   if (props.book.status !== 'not_imported' || isImporting.value) {
@@ -109,6 +112,10 @@ const canShowOwnershipToggle = (): boolean => {
     !props.loading
   );
 };
+
+const toggleDescription = () => {
+  descriptionExpanded.value = !descriptionExpanded.value;
+};
 </script>
 
 <template>
@@ -120,8 +127,11 @@ const canShowOwnershipToggle = (): boolean => {
         :alt="`Cover of ${book.title}`"
         class="book-card__image"
         loading="lazy"
-      />
-      <div v-else class="book-card__image-placeholder">
+      >
+      <div
+        v-else
+        class="book-card__image-placeholder"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -144,15 +154,54 @@ const canShowOwnershipToggle = (): boolean => {
         <h3 class="book-card__title">
           {{ book.title }}
         </h3>
-        <StatusBadge :status="book.status" size="sm" />
+        <StatusBadge
+          :status="book.status"
+          size="sm"
+        />
       </div>
 
-      <p v-if="showAuthorName" class="book-card__author">
+      <p
+        v-if="showAuthorName"
+        class="book-card__author"
+      >
         {{ getAuthorNames() }}
       </p>
 
+      <div
+        v-if="showDescription && book.description"
+        class="book-card__description-container"
+      >
+        <p
+          :class="[
+            'book-card__description',
+            { 'book-card__description--truncated': !descriptionExpanded },
+          ]"
+        >
+          {{ book.description }}
+        </p>
+        <!-- Show Less button when expanded -->
+        <button
+          v-if="descriptionExpanded"
+          class="book-card__description-toggle"
+          @click="toggleDescription"
+        >
+          Show less
+        </button>
+        <!-- Show More button hint (only visible if text is longer than ~150 chars) -->
+        <button
+          v-else-if="book.description.length > 150"
+          class="book-card__description-toggle"
+          @click="toggleDescription"
+        >
+          Show more
+        </button>
+      </div>
+
       <div class="book-card__metadata">
-        <span v-if="book.isbn" class="book-card__metadata-item"> ISBN: {{ book.isbn }} </span>
+        <span
+          v-if="book.isbn"
+          class="book-card__metadata-item"
+        > ISBN: {{ book.isbn }} </span>
         <span class="book-card__metadata-item">
           {{ formatPublicationDate(book.publicationDate) }}
         </span>
@@ -174,7 +223,11 @@ const canShowOwnershipToggle = (): boolean => {
           stroke="currentColor"
           class="book-card__button-icon"
         >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 4.5v15m7.5-7.5h-15"
+          />
         </svg>
         <svg
           v-else
@@ -201,7 +254,10 @@ const canShowOwnershipToggle = (): boolean => {
       </button>
 
       <!-- Action buttons row -->
-      <div v-if="canDelete() || canShowOwnershipToggle()" class="book-card__actions">
+      <div
+        v-if="canDelete() || canShowOwnershipToggle()"
+        class="book-card__actions"
+      >
         <button
           v-if="canDelete()"
           :disabled="isDeleting || loading"
@@ -249,7 +305,10 @@ const canShowOwnershipToggle = (): boolean => {
         </button>
 
         <!-- Ownership dropdown button -->
-        <div v-if="canShowOwnershipToggle()" class="book-card__ownership-dropdown">
+        <div
+          v-if="canShowOwnershipToggle()"
+          class="book-card__ownership-dropdown"
+        >
           <button
             :disabled="loading"
             class="book-card__ownership-button"
@@ -275,8 +334,14 @@ const canShowOwnershipToggle = (): boolean => {
           </button>
 
           <!-- Dropdown menu -->
-          <div v-if="showOwnershipDropdown" class="book-card__dropdown-menu">
-            <button class="book-card__dropdown-item" @click="handleToggleOwnership">
+          <div
+            v-if="showOwnershipDropdown"
+            class="book-card__dropdown-menu"
+          >
+            <button
+              class="book-card__dropdown-item"
+              @click="handleToggleOwnership"
+            >
               {{ book.owned ? 'Mark as Not Owned' : 'Mark as Owned' }}
             </button>
           </div>
@@ -290,7 +355,10 @@ const canShowOwnershipToggle = (): boolean => {
         </div>
       </div>
 
-      <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
+      <div
+        v-else-if="book.status === 'deleted'"
+        class="book-card__deleted-message"
+      >
         This book was previously deleted
       </div>
 
@@ -386,6 +454,50 @@ const canShowOwnershipToggle = (): boolean => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.book-card__description-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.book-card__description {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.book-card__description--truncated {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.book-card__description-toggle {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.book-card__description-toggle:hover {
+  color: #2563eb;
+}
+
+.book-card__description-toggle:focus {
+  outline: none;
+  text-decoration: underline;
 }
 
 .book-card__metadata {

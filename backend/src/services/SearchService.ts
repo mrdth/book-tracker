@@ -27,6 +27,7 @@ export interface BookSearchResult {
   externalId: string;
   title: string;
   isbn: string | null;
+  description: string | null;
   publicationDate: string | null;
   coverUrl: string | null;
   authors: Array<{
@@ -34,6 +35,7 @@ export interface BookSearchResult {
     name: string;
   }>;
   status: BookStatus;
+  owned: boolean;
 }
 
 export interface AuthorSearchResult {
@@ -323,10 +325,12 @@ export class SearchService {
       externalId: String(hardcoverBook.id),
       title: hardcoverBook.title,
       isbn,
+      description: hardcoverBook.description ?? null,
       publicationDate: this.transformReleaseYear(hardcoverBook.release_year),
       coverUrl,
       authors,
       status,
+      owned: localBook?.owned ?? false,
     };
   }
 

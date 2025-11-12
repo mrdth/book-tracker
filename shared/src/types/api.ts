@@ -13,6 +13,7 @@ export interface BookSearchResult {
   externalId: string;
   title: string;
   isbn: string | null;
+  description: string | null;
   publicationDate: string | null;
   coverUrl: string | null;
   authors: Array<{
