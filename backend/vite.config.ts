@@ -26,7 +26,7 @@ export default defineConfig({
     },
     outDir: 'dist',
     emptyOutDir: true,
-    target: 'node20',
+    target: 'node22',
     ssr: true,
   },
   resolve: {
