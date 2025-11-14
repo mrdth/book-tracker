@@ -47,16 +47,23 @@ This guide covers how to deploy the Book Tracker application using Docker and Do
 
 ## Architecture
 
+The application uses an npm workspace monorepo structure with three packages:
+- `shared` - Common TypeScript types and GraphQL queries shared between frontend and backend
+- `backend` - Express API server with SQLite database
+- `frontend` - Vue 3 SPA with Vite
+
 The application consists of two services:
 
 ### Backend Service
 - Built on Node.js 20 Alpine
+- Uses npm workspaces to build shared package first, then backend
 - Runs the Express API server
 - Handles database operations and external API calls
 - Port: 3000 (internal), mapped to 3034 (host)
 
 ### Frontend Service
 - Built with Vite/Vue 3
+- Uses npm workspaces to build shared package first, then frontend
 - Served by Nginx
 - Port: 80 (internal), mapped to 8174 (host)
 

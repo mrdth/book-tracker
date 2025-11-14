@@ -1,35 +1,47 @@
-# T175: Multi-stage Dockerfile for backend production image
+# Multi-stage Dockerfile for backend production image
 # Stage 1: Build
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY backend/package*.json ./
+# Copy root package.json for workspace configuration
+COPY package*.json ./
 
-# Install dependencies
+# Copy shared package
+COPY shared ./shared
+
+# Copy backend package
+COPY backend ./backend
+
+# Install all workspace dependencies
 RUN npm ci
 
-# Copy source code
-COPY backend/src ./src
-COPY backend/tsconfig.json .
+# Build shared package first
+RUN npm run build -w shared
 
-# Build TypeScript
-RUN npm run build
+# Build backend
+RUN npm run build -w backend
 
 # Stage 2: Runtime
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY backend/package*.json ./
+# Copy root package.json for workspace configuration
+COPY package*.json ./
+
+# Copy shared package.json and built files
+COPY shared/package*.json ./shared/
+COPY --from=builder /app/shared/dist ./shared/dist
+
+# Copy backend package.json
+COPY backend/package*.json ./backend/
 
 # Install production dependencies only
-RUN npm ci --only=production
+RUN npm ci --only=production --workspaces
 
-# Copy built application from builder stage
-COPY --from=builder /app/dist ./dist
+# Copy built backend application from builder stage
+COPY --from=builder /app/backend/dist ./backend/dist
 
 # Health check
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=10s \
@@ -37,6 +49,9 @@ HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=10s \
 
 # Expose port
 EXPOSE 3000
+
+# Set working directory to backend for runtime
+WORKDIR /app/backend
 
 # Start application
 CMD ["node", "dist/index.js"]
