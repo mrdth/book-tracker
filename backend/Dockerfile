@@ -25,8 +25,9 @@ RUN npm run build -w backend
 # Copy SQL files to dist (not copied by TypeScript compiler)
 # Create db directory in dist if it doesn't exist
 RUN mkdir -p /app/backend/dist/db
-# Copy schema.sql
+# Copy schema.sql to both locations for compatibility
 RUN cp /app/backend/src/db/schema.sql /app/backend/dist/db/schema.sql
+RUN cp /app/backend/src/db/schema.sql /app/backend/dist/schema.sql
 # Copy migrations directory
 RUN cp -r /app/backend/src/db/migrations /app/backend/dist/db/migrations
 
