@@ -8,9 +8,16 @@ export function createApp(): express.Application {
   const app = express();
 
   // CORS configuration
+  const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',');
   app.use(
     cors({
-      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+      origin: (origin, callback) => {
+        if (!origin || allowedOrigins.some((allowed) => origin.includes(allowed.trim()))) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
     })
   );

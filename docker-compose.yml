@@ -11,10 +11,10 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
       PORT: 3000
       DATABASE_PATH: /app/data/books.db
-      COLLECTION_ROOT: ${COLLECTION_ROOT:-/data/books}
+      COLLECTION_ROOT: /data/books
       HARDCOVER_API_URL: ${HARDCOVER_API_URL:-https://api.hardcover.app/v1/graphql}
       HARDCOVER_API_KEY: ${HARDCOVER_API_KEY}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8174}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8174,http://192.168.1.86:8174}
     volumes:
       # Persistent database storage
       - db-data:/app/data

@@ -6,6 +6,8 @@ import type {
   AuthorsListResponse,
 } from '@shared/types/author';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
 interface UseAuthorsListReturn {
   authors: Ref<AuthorListItem[]>;
   loading: Ref<boolean>;
@@ -47,7 +49,7 @@ export function useAuthorsList(letterFilter?: Ref<string | null>): UseAuthorsLis
         limit: 50,
       };
 
-      const response = await fetch('/api/authors/list', {
+      const response = await fetch(`${API_BASE_URL}/authors/list`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
