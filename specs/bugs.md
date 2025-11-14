@@ -1,6 +1,3 @@
-Issues:
-- when importing an author & books, we need pagination for authors with many books.
-
 
 feature suggestions:
 - fuzzy matching of local book titles during owned check - use fuse.js
