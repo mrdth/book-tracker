@@ -29,7 +29,8 @@ RUN mkdir -p /app/backend/dist/db
 RUN cp /app/backend/src/db/schema.sql /app/backend/dist/db/schema.sql
 RUN cp /app/backend/src/db/schema.sql /app/backend/dist/schema.sql
 # Copy migrations directory
-RUN cp -r /app/backend/src/db/migrations /app/backend/dist/db/migrations
+RUN cp -r /app/backend/src/db/migrations /app/backend/dist/db/migrations && \
+    ls -la /app/backend/dist/db/migrations/
 
 # Stage 2: Runtime
 FROM node:22-alpine
