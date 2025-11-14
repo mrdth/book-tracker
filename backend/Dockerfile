@@ -23,8 +23,12 @@ RUN npm run build -w shared
 RUN npm run build -w backend
 
 # Copy SQL files to dist (not copied by TypeScript compiler)
-RUN cp -r /app/backend/src/db/*.sql /app/backend/dist/db/ 2>/dev/null || true
-RUN cp -r /app/backend/src/db/migrations /app/backend/dist/db/ 2>/dev/null || true
+# Create db directory in dist if it doesn't exist
+RUN mkdir -p /app/backend/dist/db
+# Copy schema.sql
+RUN cp /app/backend/src/db/schema.sql /app/backend/dist/db/schema.sql
+# Copy migrations directory
+RUN cp -r /app/backend/src/db/migrations /app/backend/dist/db/migrations
 
 # Stage 2: Runtime
 FROM node:22-alpine
