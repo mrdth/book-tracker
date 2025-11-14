@@ -1,0 +1,57 @@
+services:
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - '${BACKEND_PORT:-3034}:3000'
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      PORT: 3000
+      DATABASE_PATH: /app/data/books.db
+      COLLECTION_ROOT: ${COLLECTION_ROOT:-/data/books}
+      HARDCOVER_API_URL: ${HARDCOVER_API_URL:-https://api.hardcover.app/v1/graphql}
+      HARDCOVER_API_KEY: ${HARDCOVER_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8174}
+    volumes:
+      # Persistent database storage
+      - db-data:/app/data
+      # Optional: Mount your book collection for ownership scanning
+      - ${COLLECTION_ROOT:-./books}:/data/books:ro
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "require(\"http\").get(\"http://localhost:3000/health\", (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3034}
+        VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:3034}
+    ports:
+      - '${FRONTEND_PORT:-8174}:80'
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  # Persistent database storage
+  db-data:
+    driver: local
+
+networks:
+  default:
+    name: book-tracker-network
