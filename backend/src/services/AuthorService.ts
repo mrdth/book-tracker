@@ -604,10 +604,14 @@ export class AuthorService {
     // Execute deletion in transaction
     try {
       this.db.transaction(() => {
-        // Delete sole-authored books (hard delete)
-        for (const bookId of soleAuthoredBooks) {
-          this.bookModel.delete(bookId);
-          logger.debug('Deleted sole-authored book', { bookId, authorId });
+        // Delete sole-authored books in bulk (hard delete)
+        if (soleAuthoredBooks.length > 0) {
+          this.bookModel.deleteMany(soleAuthoredBooks);
+          logger.debug('Deleted sole-authored books', {
+            bookIds: soleAuthoredBooks,
+            count: soleAuthoredBooks.length,
+            authorId,
+          });
         }
 
         // Delete author (CASCADE removes book_authors entries)

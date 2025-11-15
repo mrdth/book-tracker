@@ -307,6 +307,18 @@ export class BookModel {
   }
 
   /**
+   * Delete multiple books in a single query (hard delete - permanent removal from database)
+   * More efficient than calling delete() in a loop
+   */
+  deleteMany(ids: number[]): void {
+    if (ids.length === 0) return;
+
+    const placeholders = ids.map(() => '?').join(',');
+    const stmt = this.db.prepare(`DELETE FROM books WHERE id IN (${placeholders})`);
+    stmt.run(...ids);
+  }
+
+  /**
    * Mark book as owned (manual override)
    */
   markOwned(id: number, manual: boolean = true): Book {
