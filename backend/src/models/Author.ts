@@ -214,8 +214,49 @@ export class AuthorModel {
   }
 
   /**
-   * Delete author (Note: In practice, authors are never deleted per business rules)
-   * This method is included for completeness but should not be used in application logic
+   * Get information about books that will be affected by author deletion
+   * Returns categorization of books by authorship (sole vs co-authored)
+   */
+  getBookDeletionInfo(authorId: number): {
+    soleAuthoredBooks: number[];
+    soleAuthoredCount: number;
+    coAuthoredBooks: number[];
+    coAuthoredCount: number;
+  } {
+    const stmt = this.db.prepare(`
+      SELECT
+        b.id,
+        COUNT(ba.author_id) as authorCount
+      FROM books b
+      JOIN book_authors ba ON b.id = ba.book_id
+      WHERE ba.author_id = ?
+        AND b.deleted = 0
+      GROUP BY b.id, ba.book_id
+    `);
+
+    const results = stmt.all(authorId) as { id: number; authorCount: number }[];
+
+    const soleAuthoredBooks: number[] = [];
+    const coAuthoredBooks: number[] = [];
+
+    for (const result of results) {
+      if (result.authorCount === 1) {
+        soleAuthoredBooks.push(result.id);
+      } else {
+        coAuthoredBooks.push(result.id);
+      }
+    }
+
+    return {
+      soleAuthoredBooks,
+      soleAuthoredCount: soleAuthoredBooks.length,
+      coAuthoredBooks,
+      coAuthoredCount: coAuthoredBooks.length,
+    };
+  }
+
+  /**
+   * Delete author (hard delete - permanent removal from database)
    */
   delete(id: number): void {
     const stmt = this.db.prepare('DELETE FROM authors WHERE id = ?');

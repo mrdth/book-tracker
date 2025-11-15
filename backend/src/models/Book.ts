@@ -299,6 +299,14 @@ export class BookModel {
   }
 
   /**
+   * Delete book (hard delete - permanent removal from database)
+   */
+  delete(id: number): void {
+    const stmt = this.db.prepare('DELETE FROM books WHERE id = ?');
+    stmt.run(id);
+  }
+
+  /**
    * Mark book as owned (manual override)
    */
   markOwned(id: number, manual: boolean = true): Book {

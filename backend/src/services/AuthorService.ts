@@ -565,4 +565,74 @@ export class AuthorService {
     if (!releaseYear) return null;
     return `${releaseYear}-01-01`;
   }
+
+  /**
+   * Delete an author and their associated books
+   *
+   * Sole-authored books are permanently deleted.
+   * Co-authored books are preserved with author association removed.
+   * Operation is atomic - all changes succeed or all are rolled back.
+   *
+   * @param authorId - The internal author ID to delete
+   * @returns Deletion summary with counts
+   * @throws Error if author not found or database operation fails
+   */
+  deleteAuthor(authorId: number): {
+    deletedAuthorId: number;
+    deletedBooksCount: number;
+    preservedBooksCount: number;
+  } {
+    logger.info('Starting author deletion', { authorId });
+
+    // Verify author exists
+    const author = this.authorModel.findById(authorId);
+    if (!author) {
+      throw errors.notFoundError('Author not found', { authorId });
+    }
+
+    // Get book deletion info
+    const deletionInfo = this.authorModel.getBookDeletionInfo(authorId);
+    const { soleAuthoredBooks, soleAuthoredCount, coAuthoredCount } = deletionInfo;
+
+    logger.info('Author deletion info retrieved', {
+      authorId,
+      authorName: author.name,
+      soleAuthoredBooks: soleAuthoredCount,
+      coAuthoredBooks: coAuthoredCount,
+    });
+
+    // Execute deletion in transaction
+    try {
+      this.db.transaction(() => {
+        // Delete sole-authored books (hard delete)
+        for (const bookId of soleAuthoredBooks) {
+          this.bookModel.delete(bookId);
+          logger.debug('Deleted sole-authored book', { bookId, authorId });
+        }
+
+        // Delete author (CASCADE removes book_authors entries)
+        this.authorModel.delete(authorId);
+        logger.debug('Deleted author record', { authorId });
+      })();
+
+      logger.info('Author deletion completed successfully', {
+        authorId,
+        authorName: author.name,
+        deletedBooksCount: soleAuthoredCount,
+        preservedBooksCount: coAuthoredCount,
+      });
+
+      return {
+        deletedAuthorId: authorId,
+        deletedBooksCount: soleAuthoredCount,
+        preservedBooksCount: coAuthoredCount,
+      };
+    } catch (error) {
+      logger.error('Author deletion failed', error, {
+        authorId,
+        authorName: author.name,
+      });
+      throw error;
+    }
+  }
 }

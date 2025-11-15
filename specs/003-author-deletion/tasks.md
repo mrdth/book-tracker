@@ -42,9 +42,9 @@ All infrastructure already exists:
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T001 [P] Add `getBookDeletionInfo()` method to `backend/src/models/Author.ts` that returns categorization of books by authorship (sole vs co-authored) with book IDs and counts
-- [ ] T002 [P] Enhance `delete()` method in `backend/src/models/Author.ts` to support hard delete operation (method exists but marked unused)
-- [ ] T003 [P] Add `deleteAuthor()` method to `backend/src/services/AuthorService.ts` that implements atomic deletion with transaction handling for author and sole-authored books
+- [X] T001 [P] Add `getBookDeletionInfo()` method to `backend/src/models/Author.ts` that returns categorization of books by authorship (sole vs co-authored) with book IDs and counts
+- [X] T002 [P] Enhance `delete()` method in `backend/src/models/Author.ts` to support hard delete operation (method exists but marked unused)
+- [X] T003 [P] Add `deleteAuthor()` method to `backend/src/services/AuthorService.ts` that implements atomic deletion with transaction handling for author and sole-authored books
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
