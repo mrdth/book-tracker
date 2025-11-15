@@ -160,7 +160,7 @@ const handleDeleteConfirm = async () => {
   try {
     await apiClient.deleteAuthor(authorId.value);
     // Redirect to authors list
-    router.push('/authors');
+    router.push('/');
   } catch (err) {
     console.error('Failed to delete author:', err);
     alert(err instanceof Error ? err.message : 'Failed to delete author');
