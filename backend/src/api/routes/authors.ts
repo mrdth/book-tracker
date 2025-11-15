@@ -386,4 +386,91 @@ router.post('/:id/refresh', async (req: Request, res: Response, next: NextFuncti
   }
 });
 
+/**
+ * GET /api/authors/:id/deletion-info
+ * Get information about books that will be affected by author deletion
+ *
+ * Response:
+ * {
+ *   "soleAuthoredBookCount": 15,
+ *   "coAuthoredBookCount": 3
+ * }
+ */
+router.get('/:id/deletion-info', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authorId = parseInt(req.params.id, 10);
+
+    if (isNaN(authorId)) {
+      throw errors.validationError('Invalid author ID');
+    }
+
+    logger.info('API request: Get author deletion info', { authorId });
+
+    // Verify author exists
+    const author = authorService.getAuthorWithBooks(authorId);
+
+    // Get deletion info from author model
+    const db = getDatabase();
+    const { AuthorModel } = await import('../../models/Author.js');
+    const authorModel = new AuthorModel(db);
+    const deletionInfo = authorModel.getBookDeletionInfo(authorId);
+
+    logger.info('API response: Author deletion info retrieved', {
+      authorId,
+      authorName: author.name,
+      soleAuthoredBookCount: deletionInfo.soleAuthoredCount,
+      coAuthoredBookCount: deletionInfo.coAuthoredCount,
+    });
+
+    res.json({
+      soleAuthoredBookCount: deletionInfo.soleAuthoredCount,
+      coAuthoredBookCount: deletionInfo.coAuthoredCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * DELETE /api/authors/:id
+ * Permanently delete an author and their associated books
+ *
+ * Sole-authored books are deleted, co-authored books are preserved
+ * with the author association removed. Operation is atomic.
+ *
+ * Response:
+ * {
+ *   "message": "Author deleted successfully",
+ *   "deletedAuthorId": 123,
+ *   "deletedBooksCount": 15,
+ *   "preservedBooksCount": 3
+ * }
+ */
+router.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authorId = parseInt(req.params.id, 10);
+
+    if (isNaN(authorId)) {
+      throw errors.validationError('Invalid author ID');
+    }
+
+    logger.info('API request: Delete author', { authorId });
+
+    const result = authorService.deleteAuthor(authorId);
+
+    logger.info('API response: Author deleted successfully', {
+      deletedAuthorId: result.deletedAuthorId,
+      deletedBooksCount: result.deletedBooksCount,
+      preservedBooksCount: result.preservedBooksCount,
+    });
+
+    res.json({
+      message: 'Author deleted successfully',
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

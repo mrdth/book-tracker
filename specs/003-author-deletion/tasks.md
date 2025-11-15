@@ -58,28 +58,28 @@ All infrastructure already exists:
 
 ### Backend Implementation for User Story 1
 
-- [ ] T004 [US1] Implement DELETE `/api/authors/:id` endpoint in `backend/src/api/routes/authors.ts` that validates author ID, calls `AuthorService.deleteAuthor()`, and returns deletion summary (deleted/preserved counts)
-- [ ] T005 [US1] Add error handling in DELETE endpoint for 404 (author not found) and 500 (database errors) scenarios in `backend/src/api/routes/authors.ts`
-- [ ] T006 [US1] Add INFO logging for deletion requests and results in `AuthorService.deleteAuthor()` method in `backend/src/services/AuthorService.ts`
-- [ ] T006.5 [US1] Add GET `/api/authors/:id/deletion-info` endpoint in `backend/src/api/routes/authors.ts` that queries book categorization using `AuthorModel.getBookDeletionInfo()` and returns `{soleAuthoredBookCount: number, coAuthoredBookCount: number}` for confirmation modal display
+- [X] T004 [US1] Implement DELETE `/api/authors/:id` endpoint in `backend/src/api/routes/authors.ts` that validates author ID, calls `AuthorService.deleteAuthor()`, and returns deletion summary (deleted/preserved counts)
+- [X] T005 [US1] Add error handling in DELETE endpoint for 404 (author not found) and 500 (database errors) scenarios in `backend/src/api/routes/authors.ts`
+- [X] T006 [US1] Add INFO logging for deletion requests and results in `AuthorService.deleteAuthor()` method in `backend/src/services/AuthorService.ts`
+- [X] T006.5 [US1] Add GET `/api/authors/:id/deletion-info` endpoint in `backend/src/api/routes/authors.ts` that queries book categorization using `AuthorModel.getBookDeletionInfo()` and returns `{soleAuthoredBookCount: number, coAuthoredBookCount: number}` for confirmation modal display
 
 ### Frontend Implementation for User Story 1
 
-- [ ] T007 [P] [US1] Create `DeleteAuthorModal.vue` component in `frontend/src/components/authors/` following EditAuthorModal pattern with the following interface:
+- [X] T007 [P] [US1] Create `DeleteAuthorModal.vue` component in `frontend/src/components/authors/` following EditAuthorModal pattern with the following interface:
   - **Props**: `author: Author | null`, `open: boolean`, `soleAuthoredBookCount: number`, `coAuthoredBookCount: number`
   - **Emits**: `@close` (when user cancels or closes modal), `@confirm` (when user confirms deletion)
   - **Structure**: Modal dialog with author name display, book count breakdown, destructive confirm button ("Delete Author"), cancel button, loading state support, Escape key handler, click-outside-to-close
-- [ ] T008 [P] [US1] Implement modal UI in `DeleteAuthorModal.vue` with author name display, book counts, confirm/cancel buttons, and loading state
-- [ ] T009 [P] [US1] Add `deleteAuthor(authorId: number)` method to `frontend/src/services/api.ts` that calls DELETE endpoint and returns deletion result
+- [X] T008 [P] [US1] Implement modal UI in `DeleteAuthorModal.vue` with author name display, book counts, confirm/cancel buttons, and loading state
+- [X] T009 [P] [US1] Add `deleteAuthor(authorId: number)` method to `frontend/src/services/api.ts` that calls DELETE endpoint and returns deletion result
   - **Method Signature**: `async deleteAuthor(authorId: number): Promise<{message: string, deletedAuthorId: number, deletedBooksCount: number, preservedBooksCount: number}>`
   - **Error Handling**: Throws Error with `message` property on failure (HTTP 4xx/5xx), including parsed error message from API response or generic "Failed to delete author" fallback
   - **Implementation**: Calls `DELETE /api/authors/:id`, validates response, extracts counts from JSON body
-- [ ] T010 [US1] Add Delete button to `frontend/src/pages/AuthorPage.vue` in header actions section after Edit and Update buttons with destructive styling (red color)
-- [ ] T011 [US1] Add state management in `AuthorPage.vue` for modal visibility (`isDeleteModalOpen` ref) and deletion in progress (`isDeleting` ref)
-- [ ] T012 [US1] Implement `handleDeleteClick()` in `AuthorPage.vue` that fetches book categorization and opens DeleteAuthorModal with counts
-- [ ] T013 [US1] Implement `handleDeleteConfirm()` in `AuthorPage.vue` that calls `apiClient.deleteAuthor()`, handles success (redirect to /authors), and handles errors (display message, stay on page)
-- [ ] T014 [US1] Add loading state to Delete button in `AuthorPage.vue` showing spinner during deletion operation (disabled while `isDeleting === true`)
-- [ ] T015 [US1] Implement redirect to authors list page using `router.push('/authors')` on successful deletion in `AuthorPage.vue`
+- [X] T010 [US1] Add Delete button to `frontend/src/pages/AuthorPage.vue` in header actions section after Edit and Update buttons with destructive styling (red color)
+- [X] T011 [US1] Add state management in `AuthorPage.vue` for modal visibility (`isDeleteModalOpen` ref) and deletion in progress (`isDeleting` ref)
+- [X] T012 [US1] Implement `handleDeleteClick()` in `AuthorPage.vue` that fetches book categorization and opens DeleteAuthorModal with counts
+- [X] T013 [US1] Implement `handleDeleteConfirm()` in `AuthorPage.vue` that calls `apiClient.deleteAuthor()`, handles success (redirect to /authors), and handles errors (display message, stay on page)
+- [X] T014 [US1] Add loading state to Delete button in `AuthorPage.vue` showing spinner during deletion operation (disabled while `isDeleting === true`)
+- [X] T015 [US1] Implement redirect to authors list page using `router.push('/authors')` on successful deletion in `AuthorPage.vue`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - users can delete authors with confirmation, see proper feedback, and get redirected
 
@@ -93,11 +93,11 @@ All infrastructure already exists:
 
 ### Implementation for User Story 2
 
-- [ ] T016 [P] [US2] Add grammar helper function `formatBookCount()` in `DeleteAuthorModal.vue` that returns proper singular/plural text (e.g., "1 book", "2 books", "0 books")
-- [ ] T017 [US2] Update `DeleteAuthorModal.vue` to display detailed message explaining what will be deleted vs preserved: "{author name} will be deleted. {N} book(s) will be deleted. {M} co-authored book(s) will be preserved."
-- [ ] T018 [US2] Add conditional rendering in `DeleteAuthorModal.vue` to show different message when author has 0 books: "Only the author will be deleted"
-- [ ] T019 [US2] Enhance `getBookDeletionInfo()` response in `backend/src/models/Author.ts` to include exact book counts for accurate UI display
-- [ ] T020 [US2] Update `handleDeleteClick()` in `AuthorPage.vue` to pass accurate counts to DeleteAuthorModal based on API response
+- [X] T016 [P] [US2] Add grammar helper function `formatBookCount()` in `DeleteAuthorModal.vue` that returns proper singular/plural text (e.g., "1 book", "2 books", "0 books")
+- [X] T017 [US2] Update `DeleteAuthorModal.vue` to display detailed message explaining what will be deleted vs preserved: "{author name} will be deleted. {N} book(s) will be deleted. {M} co-authored book(s) will be preserved."
+- [X] T018 [US2] Add conditional rendering in `DeleteAuthorModal.vue` to show different message when author has 0 books: "Only the author will be deleted"
+- [X] T019 [US2] Enhance `getBookDeletionInfo()` response in `backend/src/models/Author.ts` to include exact book counts for accurate UI display
+- [X] T020 [US2] Update `handleDeleteClick()` in `AuthorPage.vue` to pass accurate counts to DeleteAuthorModal based on API response
 
 **Checkpoint**: At this point, User Stories 1 AND 2 both work - users get clear, grammatically correct information before deletion
 
@@ -111,13 +111,13 @@ All infrastructure already exists:
 
 ### Implementation for User Story 3
 
-- [ ] T021 [P] [US3] Add comprehensive error handling in `AuthorService.deleteAuthor()` in `backend/src/services/AuthorService.ts` that wraps deletion in try-catch and logs ERROR level messages for failures
-- [ ] T022 [P] [US3] Ensure transaction rollback on any error in `AuthorService.deleteAuthor()` using better-sqlite3 transaction API to prevent partial deletions
-- [ ] T023 [US3] Update DELETE endpoint error handling in `backend/src/api/routes/authors.ts` to return appropriate HTTP status codes (404 for not found, 500 for database errors) with clear error messages
+- [X] T021 [P] [US3] Add comprehensive error handling in `AuthorService.deleteAuthor()` in `backend/src/services/AuthorService.ts` that wraps deletion in try-catch and logs ERROR level messages for failures
+- [X] T022 [P] [US3] Ensure transaction rollback on any error in `AuthorService.deleteAuthor()` using better-sqlite3 transaction API to prevent partial deletions
+- [X] T023 [US3] Update DELETE endpoint error handling in `backend/src/api/routes/authors.ts` to return appropriate HTTP status codes (404 for not found, 500 for database errors) with clear error messages
 - [ ] T024 [US3] Add error state management in `DeleteAuthorModal.vue` with `errorMessage` ref to display deletion failures
-- [ ] T025 [US3] Update `handleDeleteConfirm()` in `AuthorPage.vue` to catch errors from `apiClient.deleteAuthor()` and display error message while keeping user on current page
+- [X] T025 [US3] Update `handleDeleteConfirm()` in `AuthorPage.vue` to catch errors from `apiClient.deleteAuthor()` and display error message while keeping user on current page
 - [ ] T026 [US3] Add error message display UI in `DeleteAuthorModal.vue` with red text styling and dismiss capability
-- [ ] T027 [US3] Handle network errors separately in `frontend/src/services/api.ts` `deleteAuthor()` method to show "Network error, please try again" for connection failures
+- [X] T027 [US3] Handle network errors separately in `frontend/src/services/api.ts` `deleteAuthor()` method to show "Network error, please try again" for connection failures
 
 **Checkpoint**: All user stories should now be independently functional with robust error handling
 
@@ -129,14 +129,14 @@ All infrastructure already exists:
 
 ### Concurrent Operation Prevention
 
-- [ ] T028 [P] Update `AuthorPage.vue` to disable Delete button when `isBulkUpdating === true` or `isRefreshing === true` to prevent concurrent operations
+- [X] T028 [P] Update `AuthorPage.vue` to disable Delete button when `isBulkUpdating === true` or `isRefreshing === true` to prevent concurrent operations
 - [ ] T029 [P] Add computed property `deleteDisabled` in `AuthorPage.vue` that returns `true` when deletion should be blocked (bulk operations active, deletion in progress)
 - [ ] T030 Add tooltip or disabled button styling in `AuthorPage.vue` to show "Delete unavailable during bulk operations" when button is disabled due to concurrent operations
 
 ### Button Styling
 
-- [ ] T031 Update Delete button styling in `AuthorPage.vue` to use destructive color scheme (red background, matching existing action-button--danger or similar class pattern)
-- [ ] T032 Position Delete button in `AuthorPage.vue` header actions after Edit and Update buttons in the same button group
+- [X] T031 Update Delete button styling in `AuthorPage.vue` to use destructive color scheme (red background, matching existing action-button--danger or similar class pattern)
+- [X] T032 Position Delete button in `AuthorPage.vue` header actions after Edit and Update buttons in the same button group
 
 ---
 

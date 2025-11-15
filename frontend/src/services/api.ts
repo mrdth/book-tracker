@@ -103,6 +103,30 @@ class ApiClient {
     });
   }
 
+  async getAuthorDeletionInfo(
+    id: number
+  ): Promise<{ soleAuthoredBookCount: number; coAuthoredBookCount: number }> {
+    return this.request<{ soleAuthoredBookCount: number; coAuthoredBookCount: number }>(
+      `/authors/${id}/deletion-info`
+    );
+  }
+
+  async deleteAuthor(id: number): Promise<{
+    message: string;
+    deletedAuthorId: number;
+    deletedBooksCount: number;
+    preservedBooksCount: number;
+  }> {
+    return this.request<{
+      message: string;
+      deletedAuthorId: number;
+      deletedBooksCount: number;
+      preservedBooksCount: number;
+    }>(`/authors/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Ownership
   async triggerOwnershipScan(
     forceRefresh: boolean = false

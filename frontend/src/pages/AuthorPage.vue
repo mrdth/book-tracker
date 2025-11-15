@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import BookCard from '../components/books/BookCard.vue';
 import EditAuthorModal from '../components/authors/EditAuthorModal.vue';
+import DeleteAuthorModal from '../components/authors/DeleteAuthorModal.vue';
 import BulkActionBar from '../components/books/BulkActionBar.vue';
 import { apiClient } from '../services/api';
 import type { AuthorWithBooks } from '@shared/types/author';
@@ -15,6 +16,10 @@ const author = ref<AuthorWithBooks | null>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const isEditModalOpen = ref(false);
+const isDeleteModalOpen = ref(false);
+const isDeleting = ref(false);
+const soleAuthoredBookCount = ref(0);
+const coAuthoredBookCount = ref(0);
 const isRefreshing = ref(false);
 const isBulkMode = ref(false);
 const selectedBookIds = ref<Set<number>>(new Set());
@@ -123,6 +128,43 @@ const handleRefreshBooks = async () => {
     alert(err instanceof Error ? err.message : 'Failed to refresh books');
   } finally {
     isRefreshing.value = false;
+  }
+};
+
+const handleDeleteClick = async () => {
+  if (!authorId.value) return;
+
+  try {
+    // Fetch deletion info
+    const deletionInfo = await apiClient.getAuthorDeletionInfo(authorId.value);
+    soleAuthoredBookCount.value = deletionInfo.soleAuthoredBookCount;
+    coAuthoredBookCount.value = deletionInfo.coAuthoredBookCount;
+
+    // Open modal
+    isDeleteModalOpen.value = true;
+  } catch (err) {
+    console.error('Failed to get deletion info:', err);
+    alert(err instanceof Error ? err.message : 'Failed to get deletion information');
+  }
+};
+
+const handleCloseDeleteModal = () => {
+  if (isDeleting.value) return;
+  isDeleteModalOpen.value = false;
+};
+
+const handleDeleteConfirm = async () => {
+  if (!authorId.value || isDeleting.value) return;
+
+  isDeleting.value = true;
+  try {
+    await apiClient.deleteAuthor(authorId.value);
+    // Redirect to authors list
+    router.push('/authors');
+  } catch (err) {
+    console.error('Failed to delete author:', err);
+    alert(err instanceof Error ? err.message : 'Failed to delete author');
+    isDeleting.value = false;
   }
 };
 
@@ -312,10 +354,7 @@ onMounted(() => {
   <div class="author-page">
     <div class="author-page__container">
       <!-- Back Button -->
-      <button
-        class="author-page__back-button"
-        @click="handleBack"
-      >
+      <button class="author-page__back-button" @click="handleBack">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -334,10 +373,7 @@ onMounted(() => {
       </button>
 
       <!-- Loading State -->
-      <div
-        v-if="loading"
-        class="author-page__loading"
-      >
+      <div v-if="loading" class="author-page__loading">
         <svg
           class="author-page__spinner"
           xmlns="http://www.w3.org/2000/svg"
@@ -358,16 +394,11 @@ onMounted(() => {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
-        <p class="author-page__loading-text">
-          Loading author...
-        </p>
+        <p class="author-page__loading-text">Loading author...</p>
       </div>
 
       <!-- Error State -->
-      <div
-        v-else-if="error"
-        class="author-page__error"
-      >
+      <div v-else-if="error" class="author-page__error">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
@@ -386,10 +417,7 @@ onMounted(() => {
       </div>
 
       <!-- Author Content -->
-      <div
-        v-else-if="author"
-        class="author-page__content"
-      >
+      <div v-else-if="author" class="author-page__content">
         <!-- Author Header -->
         <header class="author-page__header">
           <div class="author-page__header-content">
@@ -399,11 +427,8 @@ onMounted(() => {
                 :src="author.photoUrl"
                 :alt="`Photo of ${author.name}`"
                 class="author-page__photo"
-              >
-              <div
-                v-else
-                class="author-page__photo-placeholder"
-              >
+              />
+              <div v-else class="author-page__photo-placeholder">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -503,16 +528,56 @@ onMounted(() => {
                 </svg>
                 <span>{{ isRefreshing ? 'Refreshing...' : 'Update from API' }}</span>
               </button>
+
+              <button
+                :disabled="isBulkUpdating || isRefreshing || isDeleting"
+                class="action-button action-button--danger"
+                title="Delete author and their books"
+                @click="handleDeleteClick"
+              >
+                <svg
+                  v-if="!isDeleting"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="action-icon"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                  />
+                </svg>
+                <svg
+                  v-else
+                  class="action-icon action-spinner"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  />
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
+              </button>
             </div>
           </div>
 
-          <div
-            v-if="author.bio"
-            class="author-page__bio"
-          >
-            <h2 class="author-page__bio-title">
-              Biography
-            </h2>
+          <div v-if="author.bio" class="author-page__bio">
+            <h2 class="author-page__bio-title">Biography</h2>
             <p class="author-page__bio-text">
               {{ author.bio }}
             </p>
@@ -522,13 +587,8 @@ onMounted(() => {
         <!-- Books Section -->
         <section class="author-page__books">
           <div class="author-page__books-header">
-            <h2 class="author-page__books-title">
-              Books
-            </h2>
-            <div
-              v-if="author.books.length > 0 && !isBulkMode"
-              class="author-page__header-actions"
-            >
+            <h2 class="author-page__books-title">Books</h2>
+            <div v-if="author.books.length > 0 && !isBulkMode" class="author-page__header-actions">
               <!-- Filter Dropdown -->
               <div class="filter-dropdown">
                 <button
@@ -568,10 +628,7 @@ onMounted(() => {
                 </button>
 
                 <!-- Dropdown menu -->
-                <div
-                  v-if="showFilterDropdown"
-                  class="filter-dropdown__menu"
-                >
+                <div v-if="showFilterDropdown" class="filter-dropdown__menu">
                   <button
                     :class="[
                       'filter-dropdown__item',
@@ -648,10 +705,7 @@ onMounted(() => {
             @cancel="toggleBulkMode"
           />
 
-          <div
-            v-if="author.books.length === 0"
-            class="author-page__no-books"
-          >
+          <div v-if="author.books.length === 0" class="author-page__no-books">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -666,31 +720,23 @@ onMounted(() => {
                 d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
               />
             </svg>
-            <p class="author-page__no-books-text">
-              No books in your library
-            </p>
+            <p class="author-page__no-books-text">No books in your library</p>
           </div>
 
-          <div
-            v-else-if="filteredBooks.length > 0"
-            class="author-page__books-list"
-          >
+          <div v-else-if="filteredBooks.length > 0" class="author-page__books-list">
             <div
               v-for="book in filteredBooks"
               :key="book.id"
               class="book-item"
               :class="{ 'book-item--selected': selectedBookIds.has(book.id) }"
             >
-              <label
-                v-if="isBulkMode"
-                class="book-item__checkbox"
-              >
+              <label v-if="isBulkMode" class="book-item__checkbox">
                 <input
                   type="checkbox"
                   :checked="selectedBookIds.has(book.id)"
                   class="checkbox-input"
                   @change="toggleBookSelection(book.id)"
-                >
+                />
               </label>
               <div class="book-item__content">
                 <BookCard
@@ -708,10 +754,7 @@ onMounted(() => {
           </div>
 
           <!-- No results for current filter -->
-          <div
-            v-else
-            class="author-page__no-books"
-          >
+          <div v-else class="author-page__no-books">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -740,6 +783,16 @@ onMounted(() => {
       :open="isEditModalOpen"
       @close="handleCloseEditModal"
       @save="handleSaveAuthor"
+    />
+
+    <!-- Delete Author Modal -->
+    <DeleteAuthorModal
+      :author="author"
+      :open="isDeleteModalOpen"
+      :sole-authored-book-count="soleAuthoredBookCount"
+      :co-authored-book-count="coAuthoredBookCount"
+      @close="handleCloseDeleteModal"
+      @confirm="handleDeleteConfirm"
     />
   </div>
 </template>
@@ -976,6 +1029,20 @@ onMounted(() => {
   background-color: #f3f4f6;
   color: #374151;
   border: 1px solid #d1d5db;
+}
+
+.action-button--danger {
+  background-color: #dc2626;
+  color: white;
+}
+
+.action-button--danger:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.action-button--danger:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.3);
 }
 
 .action-button--secondary:hover:not(:disabled) {
