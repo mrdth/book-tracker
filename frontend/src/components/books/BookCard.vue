@@ -127,11 +127,8 @@ const toggleDescription = () => {
         :alt="`Cover of ${book.title}`"
         class="book-card__image"
         loading="lazy"
-      >
-      <div
-        v-else
-        class="book-card__image-placeholder"
-      >
+      />
+      <div v-else class="book-card__image-placeholder">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -154,23 +151,14 @@ const toggleDescription = () => {
         <h3 class="book-card__title">
           {{ book.title }}
         </h3>
-        <StatusBadge
-          :status="book.status"
-          size="sm"
-        />
+        <StatusBadge :status="book.status" size="sm" />
       </div>
 
-      <p
-        v-if="showAuthorName"
-        class="book-card__author"
-      >
+      <p v-if="showAuthorName" class="book-card__author">
         {{ getAuthorNames() }}
       </p>
 
-      <div
-        v-if="showDescription && book.description"
-        class="book-card__description-container"
-      >
+      <div v-if="showDescription && book.description" class="book-card__description-container">
         <p
           :class="[
             'book-card__description',
@@ -198,10 +186,7 @@ const toggleDescription = () => {
       </div>
 
       <div class="book-card__metadata">
-        <span
-          v-if="book.isbn"
-          class="book-card__metadata-item"
-        > ISBN: {{ book.isbn }} </span>
+        <span v-if="book.isbn" class="book-card__metadata-item"> ISBN: {{ book.isbn }} </span>
         <span class="book-card__metadata-item">
           {{ formatPublicationDate(book.publicationDate) }}
         </span>
@@ -223,11 +208,7 @@ const toggleDescription = () => {
           stroke="currentColor"
           class="book-card__button-icon"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 4.5v15m7.5-7.5h-15"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
         <svg
           v-else
@@ -254,10 +235,7 @@ const toggleDescription = () => {
       </button>
 
       <!-- Action buttons row -->
-      <div
-        v-if="canDelete() || canShowOwnershipToggle()"
-        class="book-card__actions"
-      >
+      <div v-if="canDelete() || canShowOwnershipToggle()" class="book-card__actions">
         <button
           v-if="canDelete()"
           :disabled="isDeleting || loading"
@@ -301,14 +279,10 @@ const toggleDescription = () => {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span>{{ isDeleting ? 'Deleting...' : 'Delete' }}</span>
         </button>
 
         <!-- Ownership dropdown button -->
-        <div
-          v-if="canShowOwnershipToggle()"
-          class="book-card__ownership-dropdown"
-        >
+        <div v-if="canShowOwnershipToggle()" class="book-card__ownership-dropdown">
           <button
             :disabled="loading"
             class="book-card__ownership-button"
@@ -334,14 +308,8 @@ const toggleDescription = () => {
           </button>
 
           <!-- Dropdown menu -->
-          <div
-            v-if="showOwnershipDropdown"
-            class="book-card__dropdown-menu"
-          >
-            <button
-              class="book-card__dropdown-item"
-              @click="handleToggleOwnership"
-            >
+          <div v-if="showOwnershipDropdown" class="book-card__dropdown-menu">
+            <button class="book-card__dropdown-item" @click="handleToggleOwnership">
               {{ book.owned ? 'Mark as Not Owned' : 'Mark as Owned' }}
             </button>
           </div>
@@ -355,10 +323,7 @@ const toggleDescription = () => {
         </div>
       </div>
 
-      <div
-        v-else-if="book.status === 'deleted'"
-        class="book-card__deleted-message"
-      >
+      <div v-else-if="book.status === 'deleted'" class="book-card__deleted-message">
         This book was previously deleted
       </div>
 
