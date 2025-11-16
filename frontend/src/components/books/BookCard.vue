@@ -31,6 +31,7 @@ const emit = defineEmits<{
 const isImporting = ref(false);
 const isDeleting = ref(false);
 const showOwnershipDropdown = ref(false);
+const showSearchDropdown = ref(false);
 const descriptionExpanded = ref(false);
 
 const handleImport = async () => {
@@ -115,6 +116,31 @@ const canShowOwnershipToggle = (): boolean => {
 
 const toggleDescription = () => {
   descriptionExpanded.value = !descriptionExpanded.value;
+};
+
+const toggleSearchDropdown = () => {
+  showSearchDropdown.value = !showSearchDropdown.value;
+};
+
+const closeSearchDropdown = () => {
+  showSearchDropdown.value = false;
+};
+
+const handleSearchTitle = () => {
+  const mamUrlTitle = `https://www.myanonamouse.net/tor/browse.php?tor[text]=${encodeURIComponent(props.book.title)}`;
+  window.open(mamUrlTitle, '_blank');
+  closeSearchDropdown();
+};
+
+const handleSearchTitleAuthor = () => {
+  const author = getAuthorNames();
+  const mamUrlTitleAuthor = `https://www.myanonamouse.net/tor/browse.php?tor[text]=${encodeURIComponent(props.book.title + ' ' + author)}`;
+  window.open(mamUrlTitleAuthor, '_blank');
+  closeSearchDropdown();
+};
+
+const canShowSearchButton = (): boolean => {
+  return props.book.status === 'imported' && !props.book.owned && !props.loading;
 };
 </script>
 
@@ -235,7 +261,10 @@ const toggleDescription = () => {
       </button>
 
       <!-- Action buttons row -->
-      <div v-if="canDelete() || canShowOwnershipToggle()" class="book-card__actions">
+      <div
+        v-if="canDelete() || canShowOwnershipToggle() || canShowSearchButton()"
+        class="book-card__actions"
+      >
         <button
           v-if="canDelete()"
           :disabled="isDeleting || loading"
@@ -280,6 +309,61 @@ const toggleDescription = () => {
             />
           </svg>
         </button>
+
+        <!-- Search dropdown button -->
+        <div v-if="canShowSearchButton()" class="book-card__search-dropdown">
+          <button
+            :disabled="loading"
+            class="book-card__search-button"
+            :aria-label="`Search for ${book.title}`"
+            @click="toggleSearchDropdown"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="book-card__button-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+              />
+            </svg>
+            <span>Search</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="book-card__dropdown-icon"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          </button>
+
+          <!-- Dropdown menu -->
+          <div v-if="showSearchDropdown" class="book-card__dropdown-menu">
+            <button class="book-card__dropdown-item" @click="handleSearchTitle">Title</button>
+            <button class="book-card__dropdown-item" @click="handleSearchTitleAuthor">
+              Title & Author
+            </button>
+          </div>
+
+          <!-- Backdrop to close dropdown when clicking outside -->
+          <div
+            v-if="showSearchDropdown"
+            class="book-card__dropdown-backdrop"
+            @click="closeSearchDropdown"
+          />
+        </div>
 
         <!-- Ownership dropdown button -->
         <div v-if="canShowOwnershipToggle()" class="book-card__ownership-dropdown">
@@ -560,11 +644,16 @@ const toggleDescription = () => {
   }
 }
 
+.book-card__search-dropdown,
 .book-card__ownership-dropdown {
   position: relative;
+}
+
+.book-card__ownership-dropdown {
   margin-left: auto;
 }
 
+.book-card__search-button,
 .book-card__ownership-button {
   display: inline-flex;
   align-items: center;
@@ -580,10 +669,20 @@ const toggleDescription = () => {
   color: #374151;
 }
 
+.book-card__search-button {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-color: #3b82f6;
+}
+
 .book-card__ownership-button--owned {
   background-color: #d1fae5;
   color: #065f46;
   border-color: #10b981;
+}
+
+.book-card__search-button:hover:not(:disabled) {
+  background-color: #bfdbfe;
 }
 
 .book-card__ownership-button:hover:not(:disabled) {
@@ -594,11 +693,13 @@ const toggleDescription = () => {
   background-color: #a7f3d0;
 }
 
+.book-card__search-button:focus,
 .book-card__ownership-button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
+.book-card__search-button:disabled,
 .book-card__ownership-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
