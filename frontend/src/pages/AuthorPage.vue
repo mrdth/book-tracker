@@ -79,7 +79,9 @@ const convertBookToSearchResult = (book: AuthorWithBooks['books'][number]): Book
     description: book.description,
     publicationDate: book.publicationDate,
     coverUrl: book.coverUrl,
-    authors: [],
+    authors: [
+      { externalId: author.value?.externalId || 'Unknown', name: author.value?.name || 'Unknown' },
+    ],
     status: book.deleted ? 'deleted' : 'imported',
     owned: book.owned,
   };
