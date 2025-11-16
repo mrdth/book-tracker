@@ -305,7 +305,12 @@ const handleDeleteBook = async (bookId: number) => {
 
   try {
     await apiClient.updateBook(bookId, { deleted: true });
-    await loadAuthor(); // Reload to remove deleted book from list
+    // remove book from list
+    if (author.value) {
+      author.value.books = author.value.books.filter((book) => book.id !== bookId);
+    } else {
+      await loadAuthor();
+    }
   } catch (err) {
     console.error('Failed to delete book:', err);
     alert(err instanceof Error ? err.message : 'Failed to delete book');
