@@ -126,16 +126,19 @@ const closeSearchDropdown = () => {
   showSearchDropdown.value = false;
 };
 
-const handleSearchTitle = () => {
-  const mamUrlTitle = `https://www.myanonamouse.net/tor/browse.php?tor[text]=${encodeURIComponent(props.book.title)}`;
-  window.open(mamUrlTitle, '_blank');
+const handleSearchHydra = () => {
+  const author = getAuthorNames();
+  const hydraUrl =
+    import.meta.env.VITE_HYDRA_URL +
+    `?category=All&query=${encodeURIComponent(props.book.title + ' ' + author)}&mode=search&indexers=Binsearch%252CNZBGeek%252CNZBIndex`;
+  window.open(hydraUrl, '_blank');
   closeSearchDropdown();
 };
 
-const handleSearchTitleAuthor = () => {
+const handleSearchMAM = () => {
   const author = getAuthorNames();
-  const mamUrlTitleAuthor = `https://www.myanonamouse.net/tor/browse.php?tor[text]=${encodeURIComponent(props.book.title + ' ' + author)}`;
-  window.open(mamUrlTitleAuthor, '_blank');
+  const mamUrl = `https://www.myanonamouse.net/tor/browse.php?tor[text]=${encodeURIComponent(props.book.title + ' ' + author)}`;
+  window.open(mamUrl, '_blank');
   closeSearchDropdown();
 };
 
@@ -350,10 +353,10 @@ const canShowSearchButton = (): boolean => {
 
           <!-- Dropdown menu -->
           <div v-if="showSearchDropdown" class="book-card__dropdown-menu">
-            <button class="book-card__dropdown-item" @click="handleSearchTitle">Title</button>
-            <button class="book-card__dropdown-item" @click="handleSearchTitleAuthor">
-              Title & Author
+            <button class="book-card__dropdown-item" @click="handleSearchHydra">
+              Search Hydra
             </button>
+            <button class="book-card__dropdown-item" @click="handleSearchMAM">Search MAM</button>
           </div>
 
           <!-- Backdrop to close dropdown when clicking outside -->

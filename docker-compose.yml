@@ -40,6 +40,7 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:3034}
         VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:3034}
+        VITE_HYDRA_URL: ${VITE_HYDRA_URL:-http://localhost:5076}
     ports:
       - '${FRONTEND_PORT:-8174}:80'
     depends_on:

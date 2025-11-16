@@ -22,9 +22,11 @@ RUN npm run build -w shared
 # Build frontend with Vite
 ARG VITE_API_URL=http://localhost:3000
 ARG VITE_WS_URL=ws://localhost:3000
+ARG VITE_HYDRA_URL=http://localhost:5076
 
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_WS_URL=${VITE_WS_URL}
+ENV VITE_HYDRA_URL=${VITE_HYDRA_URL}
 
 RUN npm run build -w frontend
 
